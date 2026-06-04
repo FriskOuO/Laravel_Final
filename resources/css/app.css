@@ -1,0 +1,138 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source "../**/*.blade.php";
+@source "../**/*.js";
+
+:root {
+    /* 暖色系淺色：加強對比度 */
+    --bg-primary: #fdfaf6;
+    --bg-secondary: #ffffff;
+    --bg-gradient: radial-gradient(at 0% 0%, #fff5e6 0, transparent 50%), 
+                    radial-gradient(at 100% 0%, #faefe1 0, transparent 50%);
+    
+    --text-primary: #1a120b; /* 極深褐色，確保對比度最高 */
+    --text-secondary: #3e2f1f;
+    --text-muted: #71604b;
+    
+    --border-color: rgba(26, 18, 11, 0.12);
+    --accent: #d97706;
+    --accent-contrast: #ffffff;
+    --shadow: 0 20px 50px -12px rgba(26, 18, 11, 0.1);
+}
+
+.dark {
+    color-scheme: dark;
+    /* 冷色系深色：保持清晰 */
+    --bg-primary: #020617;
+    --bg-secondary: #0f172a;
+    --bg-gradient: radial-gradient(at 0% 0%, #070e24 0, transparent 50%),
+                    radial-gradient(at 100% 0%, #020617 0, transparent 50%);
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+    
+    --border-color: rgba(255, 255, 255, 0.1);
+    --accent: #38bdf8;
+    --accent-contrast: #020617;
+    --shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
+}
+
+body {
+    background-color: var(--bg-primary);
+    background-image: var(--bg-gradient);
+    color: var(--text-primary);
+    font-family: 'Noto Sans TC', system-ui, sans-serif;
+    transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+}
+
+.app-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    width: 100%;
+    background-color: rgba(var(--bg-primary), 0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-base {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 32px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card-base:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.15);
+}
+
+.dark .card-base:hover {
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.7);
+}
+
+/* 語意化顏色類別 */
+.text-main { color: var(--text-primary) !important; }
+.text-sub { color: var(--text-secondary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+
+/* 修正首頁漸層文字在淺色模式的對比 */
+.hero-title {
+    background: linear-gradient(to bottom, var(--text-primary), var(--text-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.btn-primary {
+    background-color: var(--accent);
+    color: var(--accent-contrast);
+    border-radius: 9999px;
+    padding: 1rem 2rem;
+    font-weight: 900;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px -10px var(--accent);
+}
+
+.btn-primary:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 15px 40px -10px var(--accent);
+}
+
+.fade-in {
+    animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-glow {
+    position: absolute;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 80%;
+    background: radial-gradient(circle, var(--accent), transparent 75%);
+    opacity: 0.08;
+    filter: blur(120px);
+    z-index: -1;
+    pointer-events: none;
+}
