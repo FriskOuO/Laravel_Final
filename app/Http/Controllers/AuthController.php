@@ -56,6 +56,28 @@ class AuthController extends Controller
         ]);
     }
 
+    public function guestLogin(Request $request)
+    {
+        $user = User::where('email', 'guest@example.com')->first();
+        
+        if (!$user) {
+            $user = User::create([
+                'name' => 'Guest User',
+                'email' => 'guest@example.com',
+                'password' => Hash::make('guest123'),
+                'role' => 'guest',
+            ]);
+        }
+
+        $token = $user->createToken('guest_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ]);
+    }
+
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();

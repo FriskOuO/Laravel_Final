@@ -10,7 +10,13 @@ export async function login(payload) {
     return response.data;
 }
 
+export async function guestLogin() {
+    const response = await apiClient.post('/auth/guest-login');
+    return response.data;
+}
+
 export const authApi = {
     register,
     login,
+    guestLogin,
 };
