@@ -26,7 +26,8 @@ class StorePostRequest extends FormRequest
             'content' => 'required|string|min:5',
             'mood' => 'required|string|in:happy,neutral,sad',
             'date' => 'required|date',
-            'image_url' => 'nullable|url|max:2048',
+            'image_url' => 'nullable|string|max:2048',
+            'is_public' => 'sometimes|boolean',
         ];
     }
 

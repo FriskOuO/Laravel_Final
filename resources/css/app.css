@@ -6,49 +6,76 @@
 @source "../**/*.js";
 
 :root {
-    /* 暖色系淺色：加強對比度 */
-    --bg-primary: #fdfaf6;
-    --bg-secondary: #ffffff;
-    --bg-gradient: radial-gradient(at 0% 0%, #fff5e6 0, transparent 50%), 
-                    radial-gradient(at 100% 0%, #faefe1 0, transparent 50%);
+    /* 暖色系淺色：精細化配色 */
+    --color-bg-primary: #fdfaf6;
+    --color-bg-secondary: #ffffff;
+    --color-bg-gradient: radial-gradient(at 0% 0%, #fffbf5 0, transparent 50%), 
+                    radial-gradient(at 100% 0%, #faf5ef 0, transparent 50%);
     
-    --text-primary: #1a120b; /* 極深褐色，確保對比度最高 */
-    --text-secondary: #3e2f1f;
-    --text-muted: #71604b;
+    --color-text-primary: #1a120b;
+    --color-text-secondary: #4a3f35;
+    --color-text-muted: #8c7e6d;
     
-    --border-color: rgba(26, 18, 11, 0.08);
-    --accent: #d97706;
-    --accent-contrast: #ffffff;
-    --shadow: 0 10px 40px -10px rgba(26, 18, 11, 0.08);
-    --shadow-hover: 0 30px 70px -15px rgba(26, 18, 11, 0.15);
+    --color-border-main: rgba(26, 18, 11, 0.06);
+    --color-accent: #b45309; /* Amber-700 */
+    --color-accent-subtle: #fffaf0; /* 更純淨的米白色 */
+    --color-accent-soft: #ffedd5; /* Amber-100，更淡雅 */
+    --color-accent-contrast: #ffffff;
+    
+    --shadow: 0 10px 40px -10px rgba(26, 18, 11, 0.05);
+    --shadow-hover: 0 30px 70px -15px rgba(26, 18, 11, 0.1);
 }
 
 .dark {
     color-scheme: dark;
     /* 冷色系深色：保持清晰 */
-    --bg-primary: #020617;
-    --bg-secondary: #0f172a;
-    --bg-gradient: radial-gradient(at 0% 0%, #070e24 0, transparent 50%),
+    --color-bg-primary: #020617;
+    --color-bg-secondary: #0f172a;
+    --color-bg-gradient: radial-gradient(at 0% 0%, #070e24 0, transparent 50%),
                     radial-gradient(at 100% 0%, #020617 0, transparent 50%);
     
-    --text-primary: #f8fafc;
-    --text-secondary: #cbd5e1;
-    --text-muted: #64748b;
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #cbd5e1;
+    --color-text-muted: #64748b;
     
-    --border-color: rgba(255, 255, 255, 0.05);
-    --accent: #38bdf8;
-    --accent-contrast: #020617;
+    --color-border-main: rgba(255, 255, 255, 0.05);
+    --color-accent: #38bdf8; /* Sky-400 */
+    --color-accent-subtle: rgba(56, 189, 248, 0.05);
+    --color-accent-soft: rgba(56, 189, 248, 0.2);
+    --color-accent-contrast: #020617;
+    
     --shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.5);
     --shadow-hover: 0 40px 80px -20px rgba(0, 0, 0, 0.7);
 }
 
+/* 全域選取顏色設定：解決使用者提到的「反白」對比度問題 */
+::selection {
+    background-color: var(--color-accent);
+    color: var(--color-accent-contrast);
+}
+
+/* 針對深色/主色背景下的選取進行反轉，確保在按鈕內選取文字也清晰 */
+.btn-primary::selection,
+.btn-primary *::selection,
+.bg-slate-900::selection,
+.bg-slate-900 *::selection {
+    background-color: var(--color-accent-contrast);
+    color: var(--color-accent);
+}
+
 body {
-    background-color: var(--bg-primary);
-    background-image: var(--bg-gradient);
-    color: var(--text-primary);
+    background-color: var(--color-bg-primary);
+    background-image: var(--color-bg-gradient);
+    color: var(--color-text-primary);
     font-family: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
     transition: background-color 0.4s ease, color 0.4s ease;
     min-height: 100vh;
+    overflow-x: hidden; /* 防止背景裝飾導致橫向捲軸 */
+}
+
+.app-shell {
+    overflow-x: hidden;
+    width: 100%;
 }
 
 .app-navbar {
@@ -58,7 +85,7 @@ body {
     width: 100%;
     background-color: rgba(253, 250, 246, 0.85); /* 這裡使用固定背景色以防混色問題 */
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border-main);
 }
 
 .dark .app-navbar {
@@ -74,9 +101,29 @@ body {
     align-items: center;
 }
 
+/* 導覽列連結：提昇懸停對比度，符合白晝/黑夜配色 */
+.nav-link {
+    font-size: 0.875rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-link:hover {
+    color: var(--color-accent);
+}
+
+.nav-link.active {
+    color: var(--color-text-primary);
+    border-color: var(--color-accent);
+}
+
 .card-base {
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-main);
     border-radius: 40px; /* 更圓潤的設計 */
     padding: 2.5rem;
     box-shadow: var(--shadow);
@@ -90,107 +137,414 @@ body {
 
 .input-base {
     width: 100%;
-    background-color: #f8f9fa;
+    background-color: var(--color-accent-subtle);
     border: 2px solid transparent;
     border-radius: 20px;
     padding: 1.25rem 1.5rem;
-    color: var(--text-primary);
+    color: var(--color-text-primary);
     transition: all 0.3s ease;
 }
 
 .dark .input-base {
-    background-color: #1e293b;
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 .input-base:focus {
-    background-color: var(--bg-secondary);
-    border-color: var(--accent);
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-accent);
     outline: none;
-    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.1);
-}
-
-.dark .input-base:focus {
-    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1);
+    box-shadow: 0 0 0 4px var(--color-accent-subtle);
 }
 
 .btn-primary {
-    background-color: var(--accent);
-    color: var(--accent-contrast);
+    background-color: var(--color-accent);
+    color: var(--color-accent-contrast);
     border-radius: 24px;
     padding: 1.25rem 2.5rem;
     font-weight: 800;
     font-size: 1.125rem;
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    box-shadow: 0 12px 24px -10px var(--accent);
+    box-shadow: 0 12px 24px -10px var(--color-accent);
     cursor: pointer;
+    border: none;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
     filter: brightness(1.1);
-    box-shadow: 0 20px 40px -12px var(--accent);
+    box-shadow: 0 20px 40px -12px var(--color-accent);
 }
 
+.btn-primary:active {
+    transform: translateY(0);
+    filter: brightness(0.9);
+}
+
+/* 次要按鈕：配合整體配色，不再使用單調的灰色 */
 .btn-secondary {
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-    border: 2px solid var(--border-color);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-accent);
+    border: 2px solid var(--color-accent-soft);
     border-radius: 24px;
     padding: 1.25rem 2.5rem;
     font-weight: 800;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .btn-secondary:hover {
-    background-color: var(--bg-primary);
-    border-color: var(--text-primary);
+    background-color: var(--color-accent-subtle);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
 }
 
-/* Modal Styling */
+.btn-secondary:active {
+    transform: scale(0.96);
+    background-color: var(--color-accent-soft);
+}
+
+/* Modal Styling: 增加藝術感的設計 */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
+    background-color: rgba(26, 18, 11, 0.4);
+    backdrop-filter: blur(12px) saturate(180%);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 100;
-    animation: modalFadeIn 0.3s ease-out;
+    padding: 1.5rem;
+    animation: modalFadeIn 0.4s ease-out;
 }
 
 .modal-content {
-    background-color: var(--bg-secondary);
-    border-radius: 40px;
-    padding: 3rem;
-    max-width: 500px;
-    width: 90%;
+    background-color: var(--color-bg-secondary);
+    border-radius: 48px;
+    padding: 4rem 3rem;
+    max-width: 480px;
+    width: 100%;
     text-align: center;
-    box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.3);
-    animation: modalSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.25),
+                0 0 40px rgba(var(--color-accent-soft), 0.1);
+    border: 1px solid var(--color-border-main);
+    animation: modalSlideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* 藝術感裝飾用背景光暈 */
+.modal-art-blob {
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, var(--color-accent-soft) 0%, transparent 70%);
+    filter: blur(20px);
+    opacity: 0.5;
+    z-index: 0;
+}
+
+.modal-icon-container {
+    width: 100px;
+    height: 100px;
+    background-color: var(--color-accent-subtle);
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    margin-bottom: 2rem;
+    position: relative;
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5);
+    animation: floatingIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatingIcon {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-10px) rotate(5deg); }
 }
 
 @keyframes modalFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from { opacity: 0; backdrop-filter: blur(0); }
+    to { opacity: 1; backdrop-filter: blur(12px) saturate(180%); }
 }
 
 @keyframes modalSlideUp {
-    from { transform: translateY(50px) scale(0.9); opacity: 0; }
+    from { transform: translateY(40px) scale(0.95); opacity: 0; }
     to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
+/* 藝術感裝飾用背景光暈 - 用於主視圖 */
+.artistic-view-container {
+    position: relative;
+    z-index: 1;
+}
+
+.view-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: -1;
+    opacity: 0.2; /* 調低日間模式不透明度，讓背景更乾淨 */
+    pointer-events: none;
+    transition: opacity 1s ease;
+}
+
+.view-blob-primary {
+    background-color: var(--color-accent-soft);
+    width: 600px;
+    height: 600px;
+    top: -200px;
+    left: -200px;
+}
+
+.view-blob-secondary {
+    background-color: var(--color-accent-subtle);
+    width: 500px;
+    height: 500px;
+    bottom: -150px;
+    right: -150px;
+}
+
+.dark .view-blob {
+    opacity: 0.12;
+    filter: blur(100px);
+}
+
+/* 詳情頁圖示裝飾 */
+.detail-mood-wrapper {
+    width: 120px;
+    height: 120px;
+    background-color: var(--color-accent-subtle);
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    box-shadow: 0 20px 40px -10px var(--color-accent-subtle),
+                inset 0 0 20px rgba(255, 255, 255, 0.4);
+    position: relative;
+    border: 1px solid var(--color-accent-soft);
+}
+
+.detail-mood-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border: 2px dashed var(--color-accent-soft);
+    border-radius: 48px;
+    opacity: 0.5;
+    animation: rotateDashed 20s linear infinite;
+}
+
+@keyframes rotateDashed {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Skeleton Screen Styles */
+.skeleton {
+    background-color: var(--color-accent-subtle);
+    background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.4) 20%,
+        rgba(255, 255, 255, 0.7) 60%,
+        rgba(255, 255, 255, 0)
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 12px;
+}
+
+.dark .skeleton {
+    background-color: rgba(255, 255, 255, 0.05);
+    background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.03) 20%,
+        rgba(255, 255, 255, 0.06) 60%,
+        rgba(255, 255, 255, 0)
+    );
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton-card {
+    height: 400px;
+    width: 100%;
+    border-radius: 40px;
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+    height: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.skeleton-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+}
+
+/* 刪除時的淡出動畫 */
+.row-fade-out {
+    opacity: 0 !important;
+    transform: translateX(30px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+/* Atmospheric Background Elements */
+.app-env-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+/* Day Mode: Sun & Clouds */
+.env-sun {
+    position: absolute;
+    top: 5%;
+    right: 5%;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, #fbbf24 0%, transparent 70%);
+    filter: blur(20px);
+    border-radius: 50%;
+    opacity: 0.6;
+    transition: all 1s ease;
+}
+
+.env-cloud {
+    position: absolute;
+    background: white;
+    filter: blur(30px);
+    border-radius: 100px;
+    opacity: 0.4;
+    transition: opacity 1s ease;
+}
+
+.cloud-1 { width: 300px; height: 100px; top: 15%; animation: drift 60s linear infinite; }
+.cloud-2 { width: 200px; height: 80px; top: 40%; animation: drift 45s linear infinite reverse; }
+.cloud-3 { width: 400px; height: 120px; top: 60%; animation: drift 80s linear infinite; }
+
+@keyframes drift {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(200%); }
+}
+
+/* Night Mode: Moon & Stars */
+.env-moon {
+    position: absolute;
+    top: 5%;
+    right: 8%;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #e0f2fe 0%, transparent 70%);
+    filter: blur(15px);
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 1s ease;
+}
+
+.env-stars {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1s ease;
+    background-image: 
+        radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 50px 160px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 80px 120px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 110px 10px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 150px 150px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 190px 40px, #fff, rgba(0,0,0,0));
+    background-size: 200px 200px;
+    animation: twinkle 4s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+/* Theme Switching Logic for Background */
+.dark .env-sun { opacity: 0; transform: scale(0.5); }
+.dark .env-cloud { opacity: 0; }
+.dark .env-moon { opacity: 0.7; transform: scale(1.2); }
+.dark .env-stars { opacity: 0.5; }
+
+/* Artistic Toggle Switch */
+.custom-toggle {
+    width: 72px;
+    height: 36px;
+    background-color: var(--color-accent-soft); /* 使用主題柔和色，不再使用生硬灰色 */
+    border-radius: 100px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    border: 4px solid transparent;
+}
+
+.dark .custom-toggle {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background-color: white;
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+input:checked + .custom-toggle {
+    background-color: var(--color-accent);
+    box-shadow: 0 0 20px rgba(180, 83, 9, 0.3);
+}
+
+input:checked + .custom-toggle .toggle-knob {
+    left: 38px;
+    transform: scale(1.1);
+}
+
 /* 語意化顏色類別 */
-.text-main { color: var(--text-primary) !important; }
-.text-sub { color: var(--text-secondary) !important; }
-.text-muted { color: var(--text-muted) !important; }
+.text-main { color: var(--color-text-primary) !important; }
+.text-sub { color: var(--color-text-secondary) !important; }
+.text-muted { color: var(--color-text-muted) !important; }
+
+/* 邊框顏色類別 */
+.border-main { border-color: var(--color-text-primary) !important; }
+.border-accent { border-color: var(--color-accent) !important; }
+.border-sub { border-color: var(--color-border-main) !important; }
 
 .hero-title {
     font-size: 5rem;
     font-weight: 900;
     line-height: 1.1;
     letter-spacing: -0.04em;
-    color: var(--text-primary);
+    color: var(--color-text-primary);
 }
 
 @media (min-width: 768px) {

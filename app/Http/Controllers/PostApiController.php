@@ -9,23 +9,19 @@ use Illuminate\Support\Facades\Auth;
 
 class PostApiController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:sanctum');
-    }
-
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        if (Auth::user()->role === 'admin') {
-            $diaries = Post::orderByDesc('date')->get();
-        } else {
-            // Duplicate template/sample posts (owned by user@example.com) into the
-            // current user's account if they don't already have them. This ensures
-            // each user can edit/delete their own copy of the example posts.
-            $user = Auth::user();
+        $user = Auth::user();
+
+        if ($user && $user->role === 'admin') {
+            // Admin sees everything
+            $diaries = Post::with('user')->orderByDesc('date')->get();
+        } elseif ($user) {
+            // Logged in user: sees OWN diaries + ALL PUBLIC diaries from others
+            // Also ensure template posts are handled for the user
             $templateOwnerEmail = env('TEMPLATE_OWNER_EMAIL', 'user@example.com');
 
             $templatePosts = Post::whereHas('user', function ($q) use ($templateOwnerEmail) {
@@ -45,11 +41,19 @@ class PostApiController extends Controller
                         'mood' => $tpl->mood,
                         'date' => $tpl->date,
                         'image_url' => $tpl->image_url,
+                        'is_public' => false,
                     ]);
                 }
             }
 
-            $diaries = $user->posts()->orderByDesc('date')->get();
+            // The core change: User's posts OR any public posts
+            $diaries = Post::with('user')->where('user_id', $user->id)
+                ->orWhere('is_public', true)
+                ->orderByDesc('date')
+                ->get();
+        } else {
+            // Guest: only see public diaries
+            $diaries = Post::with('user')->where('is_public', true)->orderByDesc('date')->get();
         }
 
         return $this->successResponse($diaries, '日記列表已取得');
@@ -61,9 +65,12 @@ class PostApiController extends Controller
     public function store(StorePostRequest $request)
     {
         $data = $request->validated();
+        // Handle checkbox: if missing, it means it's private (false)
+        $data['is_public'] = $request->boolean('is_public', false);
+        
         $diary = Auth::user()->posts()->create($data);
 
-        return $this->createdResponse($diary, '日記已建立');
+        return $this->createdResponse($diary->load('user'), '日記已建立');
     }
 
     /**
@@ -71,10 +78,16 @@ class PostApiController extends Controller
      */
     public function show(string $id)
     {
-        if (Auth::user()->role === 'admin') {
-            $diary = Post::find($id);
+        $user = Auth::user();
+
+        if ($user && $user->role === 'admin') {
+            $diary = Post::with('user')->find($id);
+        } elseif ($user) {
+            $diary = Post::with('user')->where(function($q) use ($user, $id) {
+                $q->where('user_id', $user->id)->orWhere('is_public', true);
+            })->find($id);
         } else {
-            $diary = Auth::user()->posts()->find($id);
+            $diary = Post::with('user')->where('is_public', true)->find($id);
         }
 
         if (!$diary) {
@@ -100,6 +113,9 @@ class PostApiController extends Controller
         }
 
         $data = $request->validated();
+        // Handle checkbox: if missing, it means it's private (false)
+        $data['is_public'] = $request->boolean('is_public', false);
+        
         $diary->update($data);
 
         return $this->successResponse($diary, '日記已更新');

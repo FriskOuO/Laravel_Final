@@ -10,6 +10,10 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/guest-login', [AuthController::class, 'guestLogin']);
 
+// Public routes
+Route::get('/diaries', [PostApiController::class, 'index']);
+Route::get('/diaries/{id}', [PostApiController::class, 'show']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
@@ -19,17 +23,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Photo upload (for authenticated users)
     Route::post('/photos', [PhotoController::class, 'store']);
 
-    // Diary management (for regular users only)
+    // Diary management (requires specific roles)
     Route::middleware('role:user,admin')->group(function () {
-        Route::get('/diaries', [PostApiController::class, 'index']);
         Route::post('/diaries', [PostApiController::class, 'store']);
-        Route::get('/diaries/{id}', [PostApiController::class, 'show']);
         Route::put('/diaries/{id}', [PostApiController::class, 'update']);
         Route::delete('/diaries/{id}', [PostApiController::class, 'destroy']);
-    });
-
-    // Admin only endpoints (can be extended later)
-    Route::middleware('role:admin')->group(function () {
-        // Admin routes would go here
     });
 });

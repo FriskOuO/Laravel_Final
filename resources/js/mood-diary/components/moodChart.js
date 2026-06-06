@@ -2,32 +2,63 @@ import { MOOD_META } from '../constants.js';
 import { t } from '../i18n.js';
 
 export function renderMoodChart(summary) {
-    const total = Object.values(summary).reduce((sum, value) => sum + value, 0) || 1;
-    const moods = ['happy', 'neutral', 'sad'];
-
+    // This function now only provides the container; the actual chart is initialized after rendering
     return `
-        <section class="rounded-[28px] border border-white/70 bg-white/90 p-5 shadow-[0_20px_50px_rgba(148,163,184,0.16)]">
-            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">${t('emotion_ratio')}</p>
-            <h3 class="mt-2 text-xl font-black text-slate-900">${t('mood_chart')}</h3>
-            <div class="mt-5 space-y-4">
-                ${moods.map((mood) => {
-                    const value = summary[mood] ?? 0;
-                    const percent = Math.round((value / total) * 100);
-                    const meta = MOOD_META[mood];
-
-                    return `
-                        <div>
-                            <div class="mb-2 flex items-center justify-between text-sm font-semibold text-slate-700">
-                                <span>${meta.emoji} ${t(`mood_${mood}`)}</span>
-                                <span>${percent}%</span>
-                            </div>
-                            <div class="h-3 rounded-full bg-slate-100">
-                                <div class="h-3 rounded-full ${mood === 'happy' ? 'bg-amber-300' : mood === 'neutral' ? 'bg-sky-300' : 'bg-rose-300'}" style="width:${percent}%"></div>
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
+        <section class="card-base !p-8 shadow-xl">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h3 class="text-2xl font-black text-main">${t('mood_chart')}</h3>
+                    <p class="text-sm text-muted">全站使用者的情緒分布概況</p>
+                </div>
+                <div class="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center text-2xl">📊</div>
+            </div>
+            <div class="relative aspect-square max-h-[300px] mx-auto">
+                <canvas id="moodPieChart"></canvas>
+            </div>
+            <div id="chart-legend" class="mt-8 grid grid-cols-3 gap-4">
+                <!-- Legend items will be injected here or managed by Chart.js -->
             </div>
         </section>
     `;
+}
+
+export function initMoodChart(summary) {
+    const ctx = document.getElementById('moodPieChart');
+    if (!ctx) return;
+
+    const data = {
+        labels: [t('mood_happy'), t('mood_neutral'), t('mood_sad')],
+        datasets: [{
+            data: [summary.happy || 0, summary.neutral || 0, summary.sad || 0],
+            backgroundColor: [
+                '#fbbf24', // Amber-400
+                '#38bdf8', // Sky-400
+                '#fb7185'  // Rose-400
+            ],
+            borderWidth: 0,
+            hoverOffset: 20
+        }]
+    };
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: data,
+        options: {
+            cutout: '70%',
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: 30 // 增加內邊距，防止 hoverOffset 彈出時卡到邊框
+            },
+            plugins: {
+                legend: { display: false }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 2000,
+                easing: 'easeOutQuart'
+            }
+        }
+    });
 }

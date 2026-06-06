@@ -26,7 +26,8 @@ class UpdatePostRequest extends FormRequest
             'content' => 'sometimes|required|string|min:5',
             'mood' => 'sometimes|required|string|in:happy,neutral,sad',
             'date' => 'sometimes|required|date',
-            'image_url' => 'nullable|url|max:2048',
+            'image_url' => 'nullable|string|max:2048',
+            'is_public' => 'sometimes|boolean',
         ];
     }
 

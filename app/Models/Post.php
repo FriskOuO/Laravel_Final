@@ -21,6 +21,7 @@ class Post extends Model
         'mood',
         'date',
         'image_url',
+        'is_public',
         'user_id',
     ];
 
@@ -31,6 +32,7 @@ class Post extends Model
      */
     protected $casts = [
         'date' => 'date',
+        'is_public' => 'boolean',
     ];
 
     /**
