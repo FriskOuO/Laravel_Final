@@ -2,63 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\StorePhotoRequest;
+use Illuminate\Support\Facades\Storage;
 
 class PhotoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $this->middleware('auth:sanctum');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePhotoRequest $request)
     {
-        //
-    }
+        try {
+            $path = $request->file('photo')->store('diaries', 'public');
+            $url = Storage::disk('public')->url($path);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            return $this->createdResponse([
+                'url' => $url,
+            ], '圖片已上傳成功');
+        } catch (\Exception $e) {
+            return $this->errorResponse('圖片上傳失敗：' . $e->getMessage(), null, 500);
+        }
     }
 }

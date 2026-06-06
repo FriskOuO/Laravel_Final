@@ -1,6 +1,7 @@
 import { authStore } from '../stores/authStore.js';
 import { authApi } from '../api/authApi.js';
 import { diaryApi } from '../api/diaryApi.js';
+import { photoApi } from '../api/photoApi.js';
 import { clone, escapeHtml, formatDiaryDate, moodInfo, truncate, toInputDate } from '../utils.js';
 import { mockDiaries, mockUsers, moodSummary, mostActiveDay } from '../data/mockData.js';
 import { renderAdminUsersTable, bindAdminUsersTable } from '../components/adminUsersTable.js';
@@ -89,7 +90,8 @@ function historyView(state) {
 }
 
 function homeView(state) {
-    const previewDiaries = state.diaries.slice(0, 4);
+    // Always show the original three mock previews here (do not reflect user's edited/deleted posts)
+    const previewDiaries = mockDiaries.slice(0, 3);
     return `
         <div class="relative py-12 overflow-hidden">
             <div class="hero-glow"></div>
@@ -321,9 +323,11 @@ function detailView(state, { guest = false } = {}) {
 
 function formView(state) {
     const diary = state.editingDiaryId ? state.diaries.find((item) => String(item.id) === String(state.editingDiaryId)) : null;
+    const errorHtml = state.error ? `<div class="rounded-2xl bg-rose-50 px-6 py-4 text-base font-black text-rose-600 dark:bg-rose-900/20">${escapeHtml(state.error)}</div>` : '';
     return `
         <section class="mx-auto max-w-3xl py-12 fade-in">
             <div class="card-base space-y-10">
+                ${errorHtml}
                 <div class="flex items-center justify-between">
                     <h2 class="text-3xl font-black text-main">${diary ? t('edit') : t('new_diary')}</h2>
                     <button type="button" class="text-base font-black text-muted hover:text-main transition" data-back-list>${t('back_to_list')}</button>
@@ -338,11 +342,14 @@ function formView(state) {
                         <label class="text-sm font-black uppercase tracking-widest text-muted">${t('upload_photo')}</label>
                         <div class="grid gap-6 sm:grid-cols-2">
                             <div class="relative group aspect-video rounded-3xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer hover:border-accent transition-colors" data-photo-placeholder>
-                                ${diary?.image_url ? `<img src="${diary.image_url}" class="w-full h-full object-cover">` : `<span class="text-4xl">📸</span>`}
+                                <div class="photo-preview w-full h-full flex items-center justify-center">
+                                    ${diary?.image_url ? `<img src="${diary.image_url}" class="w-full h-full object-cover">` : `<span class="text-4xl">📸</span>`}
+                                </div>
+                                <input type="file" accept="image/*" hidden data-photo-file-input>
                                 <input type="hidden" name="image_url" value="${diary?.image_url || ''}">
                             </div>
                             <div class="flex flex-col justify-center space-y-4">
-                                <p class="text-sm text-sub">點擊區域上傳照片，紀錄此時此刻的風景。 (Demo 僅支援 URL)</p>
+                                <p class="text-sm text-sub">點擊區域上傳照片或貼上圖片 URL，系統會自動儲存連結。</p>
                                 <input class="input-base text-sm" placeholder="輸入圖片 URL..." value="${diary?.image_url || ''}" data-photo-url-input>
                             </div>
                         </div>
@@ -359,7 +366,8 @@ function formView(state) {
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-black uppercase tracking-widest text-muted">${t('mood_label')}</label>
-                            <select name="mood" class="input-base text-lg font-bold appearance-none cursor-pointer">
+                            <select name="mood" class="input-base text-lg font-bold appearance-none cursor-pointer" required>
+                                <option value="">-- 選擇心情 --</option>
                                 <option value="happy" ${diary?.mood === 'happy' ? 'selected' : ''}>${t('mood_happy')} 🙂</option>
                                 <option value="neutral" ${diary?.mood === 'neutral' ? 'selected' : ''}>${t('mood_neutral')} 😐</option>
                                 <option value="sad" ${diary?.mood === 'sad' ? 'selected' : ''}>${t('mood_sad')} 😢</option>
@@ -439,7 +447,7 @@ function adminView(state) {
 export function createDiaryApp(root) {
     const state = {
         view: 'list',
-        diaries: stateful(mockDiaries),
+        diaries: stateful([]),
         users: stateful(mockUsers),
         selectedDiaryId: null,
         editingDiaryId: null,
@@ -571,6 +579,19 @@ export function createDiaryApp(root) {
         wireEvents();
     }
 
+    async function fetchDiaries() {
+        if (!state.auth.isAuthenticated) return;
+        setState({ loading: true });
+        try {
+            const list = await diaryApi.list();
+            // API returns array of diaries
+            setState({ diaries: stateful(list), loading: false });
+        } catch (err) {
+            setState({ loading: false });
+            console.warn('Failed to fetch diaries from API', err);
+        }
+    }
+
     function wireEvents() {
         root.querySelectorAll('[data-nav]').forEach(b => b.addEventListener('click', () => {
             if (b.dataset.nav === 'form' && !state.auth.isAuthenticated) {
@@ -579,6 +600,8 @@ export function createDiaryApp(root) {
                 });
                 return;
             }
+            // clear any existing form/auth error when navigating
+            state.error = '';
             state.view = b.dataset.nav === 'home' ? (state.auth.isAuthenticated ? 'list' : 'home') : b.dataset.nav;
             state.editingDiaryId = null;
             render();
@@ -620,8 +643,15 @@ export function createDiaryApp(root) {
                 render();
             });
         });
+        root.querySelectorAll('[data-refresh-api]').forEach(b => b.addEventListener('click', async () => {
+            await fetchDiaries();
+            state.view = 'list';
+            state.editingDiaryId = null;
+            render();
+        }));
         root.querySelectorAll('[data-edit-diary]').forEach(b => {
             b.addEventListener('click', () => {
+                state.error = '';
                 state.editingDiaryId = b.dataset.editDiary;
                 state.view = 'form';
                 render();
@@ -629,14 +659,19 @@ export function createDiaryApp(root) {
         });
         root.querySelectorAll('[data-delete-diary]').forEach(b => {
             b.addEventListener('click', async () => {
-                if (confirm(t('delete_confirm'))) {
+                if (!confirm(t('delete_confirm'))) return;
+                try {
                     await diaryApi.remove(b.dataset.deleteDiary);
                     state.diaries = state.diaries.filter(d => String(d.id) !== String(b.dataset.deleteDiary));
                     state.view = 'list';
                     render();
+                } catch (err) {
+                    state.error = err?.formattedError?.message || err?.response?.data?.message || '刪除失敗';
+                    render();
                 }
             });
         });
+        
         root.querySelectorAll('[data-jump-preview]').forEach(b => {
             b.addEventListener('click', () => {
                 root.querySelector('#public-diary-preview')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -650,6 +685,65 @@ export function createDiaryApp(root) {
                 render();
             });
         });
+
+        const photoPlaceholder = root.querySelector('[data-photo-placeholder]');
+        const photoFileInput = root.querySelector('[data-photo-file-input]');
+        const photoUrlInput = root.querySelector('[data-photo-url-input]');
+        const photoUrlHidden = root.querySelector('input[name="image_url"]');
+
+        if (photoPlaceholder && photoFileInput) {
+            photoPlaceholder.addEventListener('click', () => photoFileInput.click());
+        }
+
+        if (photoFileInput) {
+            photoFileInput.addEventListener('change', async (event) => {
+                const file = event.target.files?.[0];
+                if (!file) {
+                    return;
+                }
+
+                try {
+                    const { url } = await photoApi.uploadPhoto(file);
+                    // Normalize returned URL: if it's relative, resolve against current origin; if hostname is localhost and missing port, attach current port
+                    let normalizedUrl = url || '';
+                    try {
+                        const resolved = new URL(normalizedUrl, window.location.origin);
+                        if ((resolved.hostname === 'localhost' || resolved.hostname === '127.0.0.1') && !resolved.port && window.location.port) {
+                            resolved.port = window.location.port;
+                        }
+                        normalizedUrl = resolved.toString();
+                    } catch (e) {
+                        // fallback: leave as-is
+                    }
+
+                    if (photoUrlHidden) {
+                        photoUrlHidden.value = normalizedUrl;
+                    }
+                    if (photoUrlInput) {
+                        photoUrlInput.value = normalizedUrl;
+                    }
+                    const preview = photoPlaceholder?.querySelector('.photo-preview');
+                    if (preview) {
+                        preview.innerHTML = `<img src="${normalizedUrl}" class="w-full h-full object-cover">`;
+                    }
+                    event.target.value = '';
+                } catch (uploadError) {
+                    state.error = '圖片上傳失敗，請使用 jpg、png、gif 或 webp 格式，且大小不超過 2MB。';
+                    render();
+                }
+            });
+        }
+
+        if (photoUrlInput && photoUrlHidden) {
+            photoUrlInput.addEventListener('input', () => {
+                const value = photoUrlInput.value.trim();
+                photoUrlHidden.value = value;
+                const preview = photoPlaceholder?.querySelector('.photo-preview');
+                if (preview) {
+                    preview.innerHTML = value ? `<img src="${escapeHtml(value)}" class="w-full h-full object-cover">` : `<span class="text-4xl">📸</span>`;
+                }
+            });
+        }
 
         const authForm = root.querySelector('[data-auth-form]');
         if (authForm) authForm.addEventListener('submit', handleAuthSubmit);
@@ -681,7 +775,7 @@ export function createDiaryApp(root) {
             state.view = 'list';
             render();
         } catch (err) {
-            state.error = '認證失敗。請檢查您的帳號密碼。';
+            state.error = err?.formattedError?.message || err?.response?.data?.message || '認證失敗。請檢查您的帳號密碼。';
             render();
         }
     }
@@ -689,11 +783,12 @@ export function createDiaryApp(root) {
     async function handleDiarySubmit(e) {
         e.preventDefault();
         const fd = new FormData(e.target);
-        const data = Object.fromEntries(fd);
+        const data = fd; // pass FormData directly to API
         try {
             if (state.editingDiaryId) {
-                await diaryApi.update(state.editingDiaryId, data);
-                state.diaries = state.diaries.map(d => String(d.id) === String(state.editingDiaryId) ? { ...d, ...data } : d);
+                const res = await diaryApi.update(state.editingDiaryId, data);
+                // update local state using returned diary object
+                state.diaries = state.diaries.map(d => String(d.id) === String(state.editingDiaryId) ? res : d);
             } else {
                 const res = await diaryApi.create(data);
                 state.diaries.unshift(res);
@@ -701,7 +796,11 @@ export function createDiaryApp(root) {
             state.view = 'list';
             render();
         } catch (err) {
-            state.error = '儲存失敗。';
+            // Prefer formatted backend message (validation errors etc.)
+            const msg = err?.formattedError?.message || err?.response?.data?.message || '儲存失敗。';
+            // If there are validation details, include them
+            const details = err?.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null;
+            state.error = details ? `${msg} ${details}` : msg;
             render();
         }
     }
@@ -719,14 +818,23 @@ export function createDiaryApp(root) {
             state.view = 'list';
             render();
         } catch (err) {
-            alert(t('profile_update_failed'));
+                    state.error = uploadError?.formattedError?.message || uploadError?.response?.data?.message || '圖片上傳失敗，請使用 jpg、png、gif 或 webp 格式，且大小不超過 2MB。';
         }
     }
 
-    authStore.subscribe(a => {
+    authStore.subscribe(async (a) => {
+        const prevAuth = state.auth?.isAuthenticated;
         state.auth = a;
+        // If user just became authenticated, fetch diaries from API
+        if (!prevAuth && state.auth.isAuthenticated) {
+            await fetchDiaries();
+        }
         render();
     });
 
     render();
+    // If already authenticated on load, fetch server diaries
+    if (state.auth.isAuthenticated) {
+        fetchDiaries();
+    }
 }
