@@ -1,0 +1,98 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-display: "Fraunces", "Playfair Display", Georgia, serif;
+}
+
+/* Warm zen beige palette inspired by minimal journaling apps */
+:root {
+  --radius: 1.25rem;
+  --background: oklch(0.97 0.012 85);
+  --foreground: oklch(0.32 0.04 50);
+  --card: oklch(0.995 0.009 88);
+  --card-foreground: oklch(0.32 0.04 50);
+  --popover: oklch(0.99 0.012 85);
+  --popover-foreground: oklch(0.32 0.04 50);
+  --primary: oklch(0.42 0.05 45);
+  --primary-foreground: oklch(0.98 0.015 80);
+  --secondary: oklch(0.92 0.025 75);
+  --secondary-foreground: oklch(0.35 0.04 50);
+  --muted: oklch(0.93 0.022 78);
+  --muted-foreground: oklch(0.55 0.035 55);
+  --accent: oklch(0.7 0.13 55);
+  --accent-foreground: oklch(0.99 0.01 80);
+  --destructive: oklch(0.58 0.18 30);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.88 0.025 75);
+  --input: oklch(0.9 0.022 78);
+  --ring: oklch(0.7 0.13 55);
+  --gradient-warm: radial-gradient(ellipse at top, oklch(0.98 0.03 72) 0%, oklch(0.96 0.02 84) 48%, oklch(0.94 0.018 82) 100%);
+  --pattern-warm: linear-gradient(135deg, rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0));
+}
+
+.dark {
+  --background: oklch(0.22 0.02 50);
+  --foreground: oklch(0.94 0.02 75);
+  --card: oklch(0.27 0.025 50);
+  --card-foreground: oklch(0.94 0.02 75);
+  --popover: oklch(0.27 0.025 50);
+  --popover-foreground: oklch(0.94 0.02 75);
+  --primary: oklch(0.85 0.04 75);
+  --primary-foreground: oklch(0.22 0.02 50);
+  --secondary: oklch(0.32 0.03 55);
+  --secondary-foreground: oklch(0.94 0.02 75);
+  --muted: oklch(0.3 0.025 50);
+  --muted-foreground: oklch(0.72 0.03 65);
+  --accent: oklch(0.72 0.13 55);
+  --accent-foreground: oklch(0.22 0.02 50);
+  --destructive: oklch(0.6 0.2 30);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.36 0.03 55);
+  --input: oklch(0.36 0.03 55);
+  --ring: oklch(0.72 0.13 55);
+  --gradient-warm: radial-gradient(ellipse at top, oklch(0.3 0.04 55) 0%, oklch(0.24 0.02 50) 70%);
+  --pattern-warm: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0));
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+    background-image:
+      radial-gradient(circle at top left, rgba(212, 155, 109, 0.14), transparent 26%),
+      radial-gradient(circle at bottom right, rgba(92, 73, 61, 0.08), transparent 28%),
+      var(--pattern-warm);
+    background-attachment: fixed;
+  }
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
+}
