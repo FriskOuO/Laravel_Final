@@ -1,38 +1,51 @@
 import { escapeHtml, formatDiaryDate } from '../utils.js';
 import { t } from '../i18n.js';
 
-export function renderAdminUsersTable(users, onSuspend) {
+export function renderAdminUsersTable(users) {
     return `
-        <section class="rounded-[28px] border border-white/70 bg-white/90 shadow-[0_20px_50px_rgba(148,163,184,0.16)]">
-            <div class="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
+        <section class="card-base !p-0 overflow-hidden border-none shadow-xl">
+            <div class="bg-accent/5 px-8 py-6 border-b border-accent-soft flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">${t('users')}</p>
-                    <h3 class="mt-2 text-xl font-black text-slate-900">${t('user_management')}</h3>
+                    <h3 class="text-2xl font-black text-main flex items-center gap-3">
+                        <span class="text-accent">👥</span> ${t('user_management')}
+                    </h3>
+                    <p class="text-sm text-muted mt-1">管理系統內的所有註冊使用者與其權限狀態</p>
                 </div>
-                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">${users.length} ${t('users')}</span>
+                <div class="px-4 py-2 bg-white dark:bg-slate-800 rounded-2xl border border-accent-soft shadow-sm">
+                    <span class="text-xs font-black text-accent uppercase tracking-widest">${users.length} ${t('users')}</span>
+                </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="min-w-full text-left text-sm">
-                    <thead class="bg-slate-50 text-xs uppercase tracking-[0.25em] text-slate-500">
+                <table class="min-w-full text-left">
+                    <thead class="bg-slate-50 dark:bg-slate-900/50 text-[10px] uppercase tracking-[0.2em] text-muted border-b border-slate-100 dark:border-slate-800">
                         <tr>
-                            <th class="px-4 py-4">${t('user_id')}</th>
-                            <th class="px-4 py-4">${t('name')}</th>
-                            <th class="px-4 py-4">${t('email')}</th>
-                            <th class="px-4 py-4">${t('created_at')}</th>
-                            <th class="px-4 py-4">${t('actions')}</th>
+                            <th class="px-8 py-5 font-black">${t('user_id')}</th>
+                            <th class="px-8 py-5 font-black">${t('name')}</th>
+                            <th class="px-8 py-5 font-black">${t('email')}</th>
+                            <th class="px-8 py-5 font-black">${t('created_at')}</th>
+                            <th class="px-8 py-5 font-black text-right">${t('actions')}</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
                         ${users.map((user) => `
-                            <tr class="border-b border-slate-100 last:border-0">
-                                <td class="px-4 py-4 font-semibold text-slate-900">#${escapeHtml(user.id)}</td>
-                                <td class="px-4 py-4 text-slate-700">${escapeHtml(user.name)}</td>
-                                <td class="px-4 py-4 text-slate-600">${escapeHtml(user.email)}</td>
-                                <td class="px-4 py-4 text-slate-500">${formatDiaryDate(user.created_at)}</td>
-                                <td class="px-4 py-4">
+                            <tr class="hover:bg-accent-subtle/30 transition-colors group">
+                                <td class="px-8 py-6">
+                                    <span class="text-xs font-black px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md text-muted">#${escapeHtml(user.id)}</span>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-accent-soft text-accent flex items-center justify-center font-black text-xs">
+                                            ${escapeHtml(user.name.charAt(0).toUpperCase())}
+                                        </div>
+                                        <span class="font-bold text-main">${escapeHtml(user.name)}</span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6 text-sub font-medium">${escapeHtml(user.email)}</td>
+                                <td class="px-8 py-6 text-muted text-sm">${formatDiaryDate(user.created_at)}</td>
+                                <td class="px-8 py-6 text-right">
                                     <button
                                         type="button"
-                                        class="rounded-full bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-800"
+                                        class="btn-secondary !py-2 !px-4 text-xs !border-amber-200 hover:!bg-amber-500 hover:!text-white active:scale-95 transition-all"
                                         data-suspend-user="${escapeHtml(user.id)}"
                                     >
                                         ${t('suspend')}

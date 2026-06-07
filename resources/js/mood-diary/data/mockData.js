@@ -8,6 +8,9 @@ export const mockDiaries = [
         mood: 'happy',
         date: toInputDate(new Date()),
         image_url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80',
+        is_public: true,
+        user_id: 999, // Admin ID
+        user: { name: 'Admin' }
     },
     {
         id: 2,
@@ -16,6 +19,9 @@ export const mockDiaries = [
         mood: 'neutral',
         date: '2026-06-02',
         image_url: '',
+        is_public: true,
+        user_id: 999,
+        user: { name: 'Admin' }
     },
     {
         id: 3,
@@ -24,6 +30,9 @@ export const mockDiaries = [
         mood: 'sad',
         date: '2026-06-01',
         image_url: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&w=900&q=80',
+        is_public: true,
+        user_id: 999,
+        user: { name: 'Admin' }
     },
 ];
 

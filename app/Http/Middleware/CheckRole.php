@@ -6,36 +6,36 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureTokenIsValid
+class CheckRole
 {
     /**
      * Handle an incoming request.
      *
      * @param  Closure(Request): (Response)  $next
+     * @param  string|array  $roles
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // Check if the user is authenticated via Sanctum
-        if (!$request->user('sanctum')) {
+        $user = $request->user('sanctum');
+
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'status' => 'unauthorized',
-                'message' => '未驗證。無效或罕少 Token。',
+                'message' => '未驗證。',
                 'errors' => null,
                 'data' => null,
             ], 401);
         }
 
-        // Check if token is valid (not expired, etc.)
-        $user = $request->user('sanctum');
-        if (!$user || !$user->tokens()->count()) {
+        if (!in_array($user->role, $roles)) {
             return response()->json([
                 'success' => false,
-                'status' => 'unauthorized',
-                'message' => 'Token 無效或已過期。',
+                'status' => 'forbidden',
+                'message' => '禁止存取。您沒有所需的角色權限。',
                 'errors' => null,
                 'data' => null,
-            ], 401);
+            ], 403);
         }
 
         return $next($request);

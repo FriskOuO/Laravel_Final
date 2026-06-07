@@ -26,11 +26,11 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
+        return $this->createdResponse([
             'access_token' => $token,
             'token_type' => 'Bearer',
             'user' => $user,
-        ]);
+        ], '帳號已成功建立');
     }
 
     public function login(Request $request)
@@ -41,19 +41,17 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'message' => 'Invalid login details'
-            ], 401);
+            return $this->unauthorizedResponse('登入憑證無效');
         }
 
         $user = User::where('email', $request->email)->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
+        return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'Bearer',
             'user' => $user,
-        ]);
+        ], '登入成功');
     }
 
     public function guestLogin(Request $request)
@@ -71,19 +69,17 @@ class AuthController extends Controller
 
         $token = $user->createToken('guest_token')->plainTextToken;
 
-        return response()->json([
+        return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'Bearer',
             'user' => $user,
-        ]);
+        ], '以訪客身分登入成功');
     }
 
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
 
-        return response()->json([
-            'message' => 'Logged out'
-        ]);
+        return $this->successResponse(null, '已登出');
     }
 }
