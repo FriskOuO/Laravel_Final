@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode, useCallback } from "react";
-import { api, getStoredUser, setStoredUser, setToken, type BackendUser } from "@/lib/api";
+import { api, clearLocalDiariesForCurrentUser, getStoredUser, isGuestSession, setStoredUser, setToken, type BackendUser } from "@/lib/api";
 import { translations, type Lang, type TKey } from "@/lib/i18n";
 
 type Theme = "light" | "dark";
@@ -80,6 +80,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       await api.logout();
     } finally {
+      if (isGuestSession()) {
+        clearLocalDiariesForCurrentUser();
+      }
       setToken(null);
       setStoredUser(null);
       setUser(null);

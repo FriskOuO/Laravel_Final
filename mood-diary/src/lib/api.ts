@@ -214,9 +214,14 @@ function setLocalDiaries(diaries: BackendDiary[]) {
   localStorage.setItem(getLocalDiariesKey(), JSON.stringify(diaries));
 }
 
-function getLocalDiariesKey() {
+export function getLocalDiariesKey() {
   const user = getStoredUser();
   return user ? `${LOCAL_DIARIES_KEY}_${user.id}` : LOCAL_DIARIES_KEY;
+}
+
+export function clearLocalDiariesForCurrentUser() {
+  const key = getLocalDiariesKey();
+  localStorage.removeItem(key);
 }
 
 function makeLocalGuestResponse(): BackendAuthResponse {
@@ -232,7 +237,7 @@ function makeLocalGuestResponse(): BackendAuthResponse {
   };
 }
 
-function isLocalGuestSession() {
+export function isGuestSession() {
   return getToken() === LOCAL_GUEST_TOKEN || getStoredUser()?.role === "guest";
 }
 
@@ -254,18 +259,33 @@ function normalizeLocalDiary(
   };
 }
 
+function mergeDiaries(primary: BackendDiary[], secondary: BackendDiary[]) {
+  const merged = new Map<string, BackendDiary>();
+  for (const diary of primary) merged.set(String(diary.id), diary);
+  for (const diary of secondary) merged.set(String(diary.id), diary);
+  return [...merged.values()].sort((a, b) => String(b.date ?? "").localeCompare(String(a.date ?? "")));
+}
+
 async function withLocalGuestFallback<T>(action: () => Promise<T>, fallback: () => T) {
   try {
     return await action();
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (
-      isLocalGuestSession() &&
+      isGuestSession() &&
       /Request failed|timed out|fetch|未授權|禁止存取|unauthorized|forbidden|token/i.test(message)
     ) {
       return fallback();
     }
     throw error;
+  }
+}
+
+async function withAnyLocalFallback<T>(action: () => Promise<T>, fallback: () => T) {
+  try {
+    return await action();
+  } catch {
+    return fallback();
   }
 }
 
@@ -305,13 +325,22 @@ export const api = {
     });
   },
   async listDiaries() {
-    return withLocalGuestFallback(
+    if (isGuestSession()) {
+      return getLocalDiaries();
+    }
+    const backend = await withLocalGuestFallback(
       () => requestJson<BackendDiary[]>("/diaries", { method: "GET" }),
-      () => getLocalDiaries(),
+      () => [],
     );
+    return mergeDiaries(backend, getLocalDiaries());
   },
   async getDiary(id: string | number) {
-    return withLocalGuestFallback(
+    if (isGuestSession()) {
+      const diary = getLocalDiaries().find((item) => String(item.id) === String(id));
+      if (!diary) throw new Error("Diary not found");
+      return diary;
+    }
+    return withAnyLocalFallback(
       () => requestJson<BackendDiary>(`/diaries/${id}`, { method: "GET" }),
       () => {
         const diary = getLocalDiaries().find((item) => String(item.id) === String(id));
@@ -321,7 +350,13 @@ export const api = {
     );
   },
   async createDiary(payload: Record<string, unknown>) {
-    return withLocalGuestFallback(
+    if (isGuestSession()) {
+      const diaries = getLocalDiaries();
+      const diary = normalizeLocalDiary(payload, Date.now());
+      setLocalDiaries([diary, ...diaries]);
+      return diary;
+    }
+    return withAnyLocalFallback(
       () =>
         requestJson<BackendDiary>("/diaries", {
           method: "POST",
@@ -336,7 +371,18 @@ export const api = {
     );
   },
   async updateDiary(id: string | number, payload: Record<string, unknown>) {
-    return withLocalGuestFallback(
+    if (isGuestSession()) {
+      const diaries = getLocalDiaries();
+      const nextDiary = normalizeLocalDiary(payload, id);
+      const nextDiaries = diaries.map((item) =>
+        String(item.id) === String(id)
+          ? { ...nextDiary, created_at: item.created_at, updated_at: new Date().toISOString() }
+          : item,
+      );
+      setLocalDiaries(nextDiaries);
+      return nextDiaries.find((item) => String(item.id) === String(id)) ?? nextDiary;
+    }
+    return withAnyLocalFallback(
       () =>
         requestJson<BackendDiary>(`/diaries/${id}`, {
           method: "PUT",
@@ -356,7 +402,11 @@ export const api = {
     );
   },
   async deleteDiary(id: string | number) {
-    return withLocalGuestFallback(
+    if (isGuestSession()) {
+      setLocalDiaries(getLocalDiaries().filter((item) => String(item.id) !== String(id)));
+      return { message: "Deleted" };
+    }
+    return withAnyLocalFallback(
       () =>
         requestJson<{ message?: string }>(`/diaries/${id}`, {
           method: "DELETE",

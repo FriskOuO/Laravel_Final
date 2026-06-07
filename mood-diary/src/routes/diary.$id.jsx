@@ -6,7 +6,7 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { DiaryEditor } from "@/components/DiaryEditor";
 import { useApp } from "@/contexts/AppContext";
-import { MOOD_EMOJI, type Diary } from "@/lib/diary";
+import { MOOD_EMOJI } from "@/lib/diary";
 import { toast } from "sonner";
 import { api, toDiaryLike } from "@/lib/api";
 
@@ -16,13 +16,13 @@ function DiaryDetail() {
   const { id } = Route.useParams();
   const { t, user, loading } = useApp();
   const navigate = useNavigate();
-  const [diary, setDiary] = useState<Diary | null>(null);
+  const [diary, setDiary] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
 
   const load = async () => {
     try {
       const data = await api.getDiary(id);
-      setDiary(toDiaryLike(data) as Diary);
+      setDiary(toDiaryLike(data));
     } catch {
       setDiary(null);
     }

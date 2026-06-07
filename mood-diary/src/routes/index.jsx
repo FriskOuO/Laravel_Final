@@ -8,7 +8,7 @@ import { DiaryCalendar } from "@/components/DiaryCalendar";
 import { DiaryEditor } from "@/components/DiaryEditor";
 import { AuthDialog } from "@/components/AuthDialog";
 import { useApp } from "@/contexts/AppContext";
-import { MOODS, type Diary, type Mood } from "@/lib/diary";
+import { MOODS } from "@/lib/diary";
 import { toast } from "sonner";
 import sampleCoffee from "@/assets/sample-coffee.jpg";
 import sampleRain from "@/assets/sample-rain.jpg";
@@ -24,11 +24,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const SAMPLE_TEMPLATES: Array<{
-  title_zh: string; title_en: string;
-  content_zh: string; content_en: string;
-  mood: Mood; offset: number; image?: string;
-}> = [
+const SAMPLE_TEMPLATES = [
   { title_zh: "安靜的早晨重置", title_en: "A quiet morning reset",
     content_zh: "慢慢沖了一杯咖啡，寫下簡短清單，並讓第一個小時遠離螢幕。整天的節奏因此柔和許多。窗外有風，桌上的楓葉是昨天散步撿的。",
     content_en: "Brewed coffee slowly, wrote a tiny list, kept the first hour screen-free. The whole day softened. There's wind outside; the maple leaves on my desk are from yesterday's walk.",
@@ -59,14 +55,50 @@ const SAMPLE_TEMPLATES: Array<{
     mood: "love", offset: 10, image: sampleLeaves },
 ];
 
+const MORE_SAMPLE_TEMPLATES = [
+  { title_zh: "早餐店的熱豆漿", title_en: "Warm soy milk morning", mood: "calm", offset: 0, image: sampleCoffee,
+    content_zh: "早上買了熱豆漿和飯糰，趕車前偷偷坐了一下。這種小小的安靜感，讓整天都比較好開始。",
+    content_en: "Grabbed warm soy milk and a rice ball before the train. That tiny pocket of quiet made the whole day easier to start." },
+  { title_zh: "午后的窗邊光線", title_en: "Afternoon window light", mood: "love", offset: 2, image: sampleBook,
+    content_zh: "下午陽光照進來，地板上有一塊很漂亮的光。沒有做什麼特別的事，但心情莫名很好。",
+    content_en: "The afternoon sun landed on the floor in a perfect shape. I didn't do anything special, but I felt oddly good." },
+  { title_zh: "公車上的耳機", title_en: "Headphones on the bus", mood: "neutral", offset: 4, image: sampleWalk,
+    content_zh: "在公車上戴著耳機看窗外，城市像慢慢往後退。今天不急著抵達，反而比較安穩。",
+    content_en: "With headphones on the bus, the city slid backward through the window. I wasn't in a hurry, and the day felt steadier." },
+  { title_zh: "下班後的便利商店", title_en: "After-work convenience store", mood: "tired", offset: 6, image: sampleRamen,
+    content_zh: "下班後只想去便利商店買點熱的東西，晚餐不需要很厲害，只要能把疲憊撐過去就好。",
+    content_en: "After work I just wanted something warm from the convenience store. Dinner didn't need to be fancy, only enough to get through the tiredness." },
+  { title_zh: "和朋友約晚餐", title_en: "Dinner with friends", mood: "happy", offset: 8, image: sampleFriends,
+    content_zh: "朋友臨時約了晚餐，聊到最後差點忘了時間。這種不用特別安排也很開心的日子，很珍貴。",
+    content_en: "A friend called for dinner and we talked until we almost lost track of time. Days like this are quietly precious." },
+  { title_zh: "雨後的散步", title_en: "Walk after rain", mood: "sad", offset: 11, image: sampleRain,
+    content_zh: "雨停後去走了一小段路，空氣很乾淨。心裡雖然還有一點沉，但至少沒有那麼亂。",
+    content_en: "I took a short walk after the rain. The air was clean, and while my heart was still heavy, it wasn't as messy." },
+  { title_zh: "河堤旁的風", title_en: "Wind by the river", mood: "calm", offset: 14, image: sampleLeaves,
+    content_zh: "站在河堤邊吹風，手機放口袋裡，什麼都不想回。那一刻覺得自己真的有休息到。",
+    content_en: "I stood by the river and let the wind pass through me. Phone in my pocket, nothing to answer. It actually felt like rest." },
+];
+
+function buildDemoTemplates() {
+  const pools = [...SAMPLE_TEMPLATES, ...MORE_SAMPLE_TEMPLATES];
+  const offsets = [0, 1, 3, 4, 6, 8, 9, 11, 13, 14, 16, 18, 21, 23, 26, 29, 33, 37, 41, 46];
+  return offsets.map((offset, index) => {
+    const base = pools[index % pools.length];
+    return {
+      ...base,
+      offset,
+    };
+  });
+}
+
 function Index() {
   const { user, loading, t, lang, guestLoginWithApi } = useApp();
-  const [diaries, setDiaries] = useState<Diary[]>([]);
-  const [view, setView] = useState<"calendar" | "cards">("calendar");
+  const [diaries, setDiaries] = useState([]);
+  const [view, setView] = useState("calendar");
   const [editorOpen, setEditorOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [fetched, setFetched] = useState(false);
-  const [monthSection, setMonthSection] = useState<"this" | "last" | "week">("this");
+  const [monthSection, setMonthSection] = useState("this");
 
   const sortedDiaries = [...diaries].sort((a, b) => b.entry_date.localeCompare(a.entry_date));
   const filteredDiaries = sortedDiaries.filter((d) => {
@@ -88,7 +120,7 @@ function Index() {
     if (!user) return;
     try {
       const data = await api.listDiaries();
-      setDiaries(data.map((item) => toDiaryLike(item)) as Diary[]);
+      setDiaries(data.map((item) => toDiaryLike(item)));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : t("error"));
     }
@@ -100,7 +132,7 @@ function Index() {
   const seedSamples = async () => {
     if (!user) return;
     const today = new Date();
-    const rows = SAMPLE_TEMPLATES.map((s) => {
+    const rows = buildDemoTemplates().map((s) => {
       const d = new Date(today); d.setDate(today.getDate() - s.offset);
       return {
         user_id: user.id,
@@ -120,6 +152,10 @@ function Index() {
     }
   };
 
+  const loadMoreSamples = async () => {
+    await seedSamples();
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -134,7 +170,6 @@ function Index() {
         await guestLoginWithApi();
         toast.success(lang === "zh" ? "歡迎訪客！" : "Welcome, guest!");
       } catch {
-        // Silent: visitor access should not be blocked by backend auth noise.
       }
     };
     return (
@@ -161,7 +196,7 @@ function Index() {
               </Button>
             </div>
             <div className="mt-20 flex items-center gap-5 text-5xl opacity-90">
-              {MOODS.map((m) => <span key={m}>{({ happy: "😊", love: "🥰", calm: "😌", neutral: "😐", tired: "😪", sad: "😢", angry: "😤" } as const)[m]}</span>)}
+              {MOODS.map((m) => <span key={m}>{({ happy: "😊", love: "🥰", calm: "😌", neutral: "😐", tired: "😪", sad: "😢", angry: "😤" })[m]}</span>)}
             </div>
           </div>
         </main>
@@ -179,72 +214,34 @@ function Index() {
         ) : (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setMonthSection("week")}
-                className={cn("rounded-full px-4 py-2 text-xs font-medium transition-all", monthSection === "week" ? "bg-primary text-primary-foreground" : "bg-card/75 text-muted-foreground ring-1 ring-border/40")}
-              >
-                {lang === "zh" ? "上週" : "Last week"}
-              </button>
-              <button
-                onClick={() => setMonthSection("last")}
-                className={cn("rounded-full px-4 py-2 text-xs font-medium transition-all", monthSection === "last" ? "bg-primary text-primary-foreground" : "bg-card/75 text-muted-foreground ring-1 ring-border/40")}
-              >
-                {lang === "zh" ? "上個月" : "Last month"}
-              </button>
-              <button
-                onClick={() => setMonthSection("this")}
-                className={cn("rounded-full px-4 py-2 text-xs font-medium transition-all", monthSection === "this" ? "bg-primary text-primary-foreground" : "bg-card/75 text-muted-foreground ring-1 ring-border/40")}
-              >
-                {lang === "zh" ? "本月" : "This month"}
-              </button>
+              <button onClick={() => setMonthSection("week")} className={cn("rounded-full px-4 py-2 text-xs font-medium transition-all", monthSection === "week" ? "bg-primary text-primary-foreground" : "bg-card/75 text-muted-foreground ring-1 ring-border/40")}>{lang === "zh" ? "上週" : "Last week"}</button>
+              <button onClick={() => setMonthSection("last")} className={cn("rounded-full px-4 py-2 text-xs font-medium transition-all", monthSection === "last" ? "bg-primary text-primary-foreground" : "bg-card/75 text-muted-foreground ring-1 ring-border/40")}>{lang === "zh" ? "上個月" : "Last month"}</button>
+              <button onClick={() => setMonthSection("this")} className={cn("rounded-full px-4 py-2 text-xs font-medium transition-all", monthSection === "this" ? "bg-primary text-primary-foreground" : "bg-card/75 text-muted-foreground ring-1 ring-border/40")}>{lang === "zh" ? "本月" : "This month"}</button>
             </div>
             {fetched && diaries.length === 0 ? (
-              <div className="rounded-[28px] bg-card/80 py-16 text-center ring-1 ring-border/40 backdrop-blur">
-                <p className="text-sm text-muted-foreground">{t("noEntries")}</p>
-              </div>
+              <div className="rounded-[28px] bg-card/80 py-16 text-center ring-1 ring-border/40 backdrop-blur"><p className="text-sm text-muted-foreground">{t("noEntries")}</p></div>
             ) : filteredDiaries.length === 0 ? (
-              <div className="rounded-[28px] bg-card/80 py-16 text-center ring-1 ring-border/40 backdrop-blur">
-                <p className="text-sm text-muted-foreground">{t("noEntries")}</p>
-              </div>
+              <div className="rounded-[28px] bg-card/80 py-16 text-center ring-1 ring-border/40 backdrop-blur"><p className="text-sm text-muted-foreground">{t("noEntries")}</p></div>
             ) : (
               filteredDiaries.map((d) => <DiaryCard key={d.id} diary={d} />)
             )}
+            <div className="pt-2">
+              <Button variant="outline" className="w-full rounded-2xl py-6 text-base" onClick={loadMoreSamples}>
+                {lang === "zh" ? "載入更多日誌" : "Load more entries"}
+              </Button>
+            </div>
           </div>
         )}
       </main>
 
       <div className="fixed bottom-5 left-0 right-0 z-20 mx-auto flex max-w-2xl items-end justify-between px-5">
         <div className="inline-flex overflow-hidden rounded-full bg-card/90 shadow-lg ring-1 ring-border/40 backdrop-blur">
-          <button
-            onClick={() => setView("calendar")}
-            className={cn("flex items-center gap-2 px-4 py-3 text-xs font-medium transition-all", view === "calendar" ? "bg-primary text-primary-foreground" : "text-muted-foreground")}
-          >
-            <CalendarDays className="h-4 w-4" />
-            {t("calendarView")}
-          </button>
-          <button
-            onClick={() => setView("cards")}
-            className={cn("flex items-center gap-2 px-4 py-3 text-xs font-medium transition-all", view === "cards" ? "bg-primary text-primary-foreground" : "text-muted-foreground")}
-          >
-            <LayoutGrid className="h-4 w-4" />
-            {t("cardView")}
-          </button>
+          <button onClick={() => setView("calendar")} className={cn("flex items-center gap-2 px-4 py-3 text-xs font-medium transition-all", view === "calendar" ? "bg-primary text-primary-foreground" : "text-muted-foreground")}><CalendarDays className="h-4 w-4" />{t("calendarView")}</button>
+          <button onClick={() => setView("cards")} className={cn("flex items-center gap-2 px-4 py-3 text-xs font-medium transition-all", view === "cards" ? "bg-primary text-primary-foreground" : "text-muted-foreground")}><LayoutGrid className="h-4 w-4" />{t("cardView")}</button>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            to="/settings"
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-card/90 text-foreground shadow-lg ring-1 ring-border/40 backdrop-blur hover:bg-muted transition-colors"
-            title={t("settings")}
-          >
-            <Settings className="h-6 w-6" />
-          </Link>
-          <button
-            onClick={() => setEditorOpen(true)}
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg hover:scale-105 transition-transform"
-            title={t("newEntry")}
-          >
-            <Plus className="h-6 w-6" />
-          </button>
+          <Link to="/settings" className="flex h-14 w-14 items-center justify-center rounded-full bg-card/90 text-foreground shadow-lg ring-1 ring-border/40 backdrop-blur hover:bg-muted transition-colors" title={t("settings")}><Settings className="h-6 w-6" /></Link>
+          <button onClick={() => setEditorOpen(true)} className="flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg hover:scale-105 transition-transform" title={t("newEntry")}><Plus className="h-6 w-6" /></button>
         </div>
       </div>
 

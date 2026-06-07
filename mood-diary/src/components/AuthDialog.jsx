@@ -7,21 +7,15 @@ import { useApp } from "@/contexts/AppContext";
 import { toast } from "sonner";
 import { BookHeart, UserRound } from "lucide-react";
 
-interface Props {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-  defaultMode?: "login" | "signup";
-}
-
-export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: Props) {
+export function AuthDialog({ open, onOpenChange, defaultMode = "login" }) {
   const { t, lang, loginWithApi, registerWithApi, guestLoginWithApi } = useApp();
-  const [mode, setMode] = useState<"login" | "signup">(defaultMode);
+  const [mode, setMode] = useState(defaultMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e) => {
     e.preventDefault();
     setBusy(true);
     if (mode === "login") {
@@ -49,7 +43,6 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }: Props)
     try {
       await guestLoginWithApi();
     } catch {
-      // Keep guest login silent and local if the backend is unavailable or rejects the role.
     } finally {
       setBusy(false);
     }

@@ -20,7 +20,7 @@ export function Header() {
       <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
         <Link to="/" className="flex items-center gap-2">
           <Sprout className="h-5 w-5 text-accent" />
-          <span className="font-display text-lg font-semibold tracking-tight">{t("appName")}</span>
+          <span className="font-display text-lg font-semibold tracking-tight">Mood Diary</span>
         </Link>
         <div className="flex items-center gap-2">
           <button
