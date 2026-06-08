@@ -59,8 +59,15 @@ export function getApiBaseUrl() {
   const raw =
     import.meta.env.VITE_API_BASE_URL ||
     globalThis.process?.env?.VITE_API_BASE_URL ||
-    "http://localhost:8000/api";
-  return trimSlash(raw);
+    "";
+  if (raw) return trimSlash(raw);
+
+  if (typeof window !== "undefined" && window.location?.hostname) {
+    const protocol = window.location.protocol === "https:" ? "https:" : "http:";
+    return `${protocol}//${window.location.hostname}:8000/api`;
+  }
+
+  return "http://localhost:8000/api";
 }
 
 function getToken() {

@@ -22,6 +22,7 @@ export function DiaryEditor({ open, onOpenChange, onSaved, existing }) {
   const [saving, setSaving] = useState(false);
   const fileRef = useRef(null);
 
+  // 開新一篇時，把表單清空回預設值。
   const reset = () => {
     setTitle("");
     setContent("");
@@ -40,6 +41,7 @@ export function DiaryEditor({ open, onOpenChange, onSaved, existing }) {
     reader.readAsDataURL(file);
   };
 
+  // 儲存按鈕的主流程：組 payload，判斷新增或編輯，最後刷新清單。
   const handleSave = async () => {
     if (!user) return;
     if (!title.trim()) {
@@ -74,6 +76,7 @@ export function DiaryEditor({ open, onOpenChange, onSaved, existing }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
+          {/* 這裡是新增 / 編輯日記的表單視窗。 */}
           <DialogTitle className="font-display text-2xl">{existing ? t("edit") : t("newEntry")}</DialogTitle>
           <DialogDescription className="sr-only">{t("tagline")}</DialogDescription>
         </DialogHeader>

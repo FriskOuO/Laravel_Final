@@ -15,6 +15,7 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }) {
   const [username, setUsername] = useState("");
   const [busy, setBusy] = useState(false);
 
+  // 正式登入 / 註冊共用同一個表單送出流程。
   const submit = async (e) => {
     e.preventDefault();
     setBusy(true);
@@ -38,6 +39,7 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }) {
     setBusy(false);
   };
 
+  // 訪客登入：先讓人進去體驗流程，但資料只會留在本機暫存。
   const guestLogin = async () => {
     setBusy(true);
     try {
@@ -54,6 +56,7 @@ export function AuthDialog({ open, onOpenChange, defaultMode = "login" }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader className="items-center text-center">
+          {/* 登入 / 註冊 / 訪客入口的彈窗。 */}
           <div className="mb-2 rounded-2xl bg-primary/10 p-3">
             <BookHeart className="h-7 w-7 text-primary" />
           </div>

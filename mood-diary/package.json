@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:mobile": "vite build --config vite.mobile.config.ts && node scripts/prepare-mobile-build.mjs",
+    "android:add": "cap add android",
+    "android:sync": "npm run build:mobile && cap sync android",
+    "android:open": "cap open android",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -67,6 +71,9 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "^2.1.1",
     "@types/node": "^22.16.5",

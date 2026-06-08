@@ -100,6 +100,7 @@ function Index() {
   const [fetched, setFetched] = useState(false);
   const [monthSection, setMonthSection] = useState("this");
 
+  // 這裡是首頁資料來源，先排序再依月份篩選，卡片區和月曆都會吃這份資料。
   const sortedDiaries = [...diaries].sort((a, b) => b.entry_date.localeCompare(a.entry_date));
   const filteredDiaries = sortedDiaries.filter((d) => {
     const dt = new Date(d.entry_date);
@@ -119,6 +120,7 @@ function Index() {
   const load = async () => {
     if (!user) return;
     try {
+      // 從 API / 本機暫存把目前帳號的日記抓回來。
       const data = await api.listDiaries();
       setDiaries(data.map((item) => toDiaryLike(item)));
     } catch (error) {
@@ -132,6 +134,7 @@ function Index() {
   const seedSamples = async () => {
     if (!user) return;
     const today = new Date();
+    // 這批是假資料，主要給錄影或展示用，一次塞多篇讓畫面更像長期使用。
     const rows = buildDemoTemplates().map((s) => {
       const d = new Date(today); d.setDate(today.getDate() - s.offset);
       return {
@@ -167,6 +170,7 @@ function Index() {
   if (!user) {
     const guestLogin = async () => {
       try {
+        // 訪客登入入口，讓人可以先看流程，不用先註冊。
         await guestLoginWithApi();
         toast.success(lang === "zh" ? "歡迎訪客！" : "Welcome, guest!");
       } catch {
@@ -210,6 +214,7 @@ function Index() {
       <Header />
       <main className="mx-auto max-w-2xl px-5 py-4">
         {view === "calendar" ? (
+          // 月曆模式：看日期 + emoji + 下方詳情。
           <DiaryCalendar diaries={diaries} />
         ) : (
           <div className="space-y-4">
@@ -218,6 +223,7 @@ function Index() {
               <button onClick={() => setMonthSection("last")} className={cn("rounded-full px-4 py-2 text-xs font-medium transition-all", monthSection === "last" ? "bg-primary text-primary-foreground" : "bg-card/75 text-muted-foreground ring-1 ring-border/40")}>{lang === "zh" ? "上個月" : "Last month"}</button>
               <button onClick={() => setMonthSection("this")} className={cn("rounded-full px-4 py-2 text-xs font-medium transition-all", monthSection === "this" ? "bg-primary text-primary-foreground" : "bg-card/75 text-muted-foreground ring-1 ring-border/40")}>{lang === "zh" ? "本月" : "This month"}</button>
             </div>
+            {/* 卡片模式：列出日記摘要，方便快速掃描與點進詳情。 */}
             {fetched && diaries.length === 0 ? (
               <div className="rounded-[28px] bg-card/80 py-16 text-center ring-1 ring-border/40 backdrop-blur"><p className="text-sm text-muted-foreground">{t("noEntries")}</p></div>
             ) : filteredDiaries.length === 0 ? (
@@ -226,6 +232,7 @@ function Index() {
               filteredDiaries.map((d) => <DiaryCard key={d.id} diary={d} />)
             )}
             <div className="pt-2">
+              {/* 錄影展示用：一次補很多篇範例日記。 */}
               <Button variant="outline" className="w-full rounded-2xl py-6 text-base" onClick={loadMoreSamples}>
                 {lang === "zh" ? "載入更多日誌" : "Load more entries"}
               </Button>

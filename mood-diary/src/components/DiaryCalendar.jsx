@@ -26,6 +26,7 @@ export function DiaryCalendar({ diaries }) {
   });
   const [selected, setSelected] = useState(toKey(new Date()));
 
+  // 依日期建立索引，月曆格子才能快速找到對應的日記。
   const map = useMemo(() => {
     const m = new Map();
     for (const d of diaries) if (!m.has(d.entry_date)) m.set(d.entry_date, d);
@@ -48,6 +49,7 @@ export function DiaryCalendar({ diaries }) {
   const selectedEntry = map.get(selected);
 
   useEffect(() => {
+    // 預設先選今天；如果今天沒寫，再跳到第一篇日記。
     if (selectedEntry) return;
     const todayEntry = map.get(todayKey);
     if (todayEntry) {
@@ -117,6 +119,7 @@ export function DiaryCalendar({ diaries }) {
                 onClick={() => setSelected(key)}
                 className={cn("group flex h-16 flex-col items-center justify-start transition-all", !isSelected && "hover:opacity-100")}
               >
+                {/* 有日記就顯示 emoji，沒有就保留淡淡的空圈。 */}
                 <span className={cn("flex h-12 w-12 items-center justify-center rounded-full transition-all", entry ? "bg-transparent" : "border border-dashed border-muted-foreground/20 bg-background/35", isSelected && "ring-0", isToday && !entry && "border-accent/50 bg-accent/10")}>
                   {entry ? <span className={cn("leading-none", isToday && "drop-shadow-sm")} style={{ fontSize: "2rem" }}>{MOOD_EMOJI[entry.mood]}</span> : <span className="h-2.5 w-2.5 rounded-full bg-transparent" />}
                 </span>
@@ -129,6 +132,7 @@ export function DiaryCalendar({ diaries }) {
 
       <div className="overflow-hidden rounded-[28px] bg-card/80 shadow-sm ring-1 ring-border/40 backdrop-blur">
         {selectedEntry ? (
+          // 下方詳情區：點月曆日期後，這裡顯示標題 / 內容 / 圖片。
           <Link to="/diary/$id" params={{ id: selectedEntry.id }} className="block group">
             {selectedEntry.image_url && <div className="aspect-[16/9] overflow-hidden bg-muted"><img src={selectedEntry.image_url} alt="" loading="lazy" className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]" onError={(e) => (e.currentTarget.style.display = "none")} /></div>}
             <div className="p-5">
