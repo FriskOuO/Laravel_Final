@@ -127,7 +127,7 @@ function historyView(state) {
                 </div>
                 ${!isAuth ? `
                     <div class="px-6 py-4 bg-accent/5 border border-accent-soft rounded-3xl flex items-center gap-4">
-                        <span class="text-sm font-bold text-accent">想要保存您的專屬心情軌跡嗎？</span>
+                        <span class="text-sm font-bold text-accent">${t('login_to_save_permanently')}</span>
                         <button class="btn-primary !py-2 !px-6 text-xs" data-open-auth="register">${t('register_now')}</button>
                     </div>
                 ` : ''}
@@ -137,8 +137,8 @@ function historyView(state) {
                 ${!isAuth ? `
                     <div class="py-32 text-center card-base border-dashed space-y-6">
                         <div class="text-6xl">🔒</div>
-                        <h3 class="text-2xl font-black text-main">請先登入以查看您的歷史紀錄</h3>
-                        <p class="text-sub">註冊或登入後，系統將會為您分析每一天的情緒起伏，陪伴您見證自我成長。</p>
+                        <h3 class="text-2xl font-black text-main">${t('login_to_save_permanently')}</h3>
+                        <p class="text-sub">${t('auth_register_sub')}</p>
                         <div class="flex justify-center gap-4 pt-4">
                             <button class="btn-primary px-8 py-3" data-open-auth="login">${t('login_now')}</button>
                             <button class="btn-secondary px-8 py-3" data-open-auth="register">${t('register_now')}</button>
@@ -174,10 +174,8 @@ function historyView(state) {
 }
 
 function homeView(state) {
-    // Priority: Admin mock diaries (first 3) + Newest real public diaries
-    const adminMocks = state.diaries.filter(d => d.user_id === 999).slice(0, 3);
-    const otherPublic = state.diaries.filter(d => d.is_public && d.user_id !== 999).slice(0, 1);
-    const displayDiaries = [...adminMocks, ...otherPublic];
+    // Priority: Newest 4 real public diaries
+    const displayDiaries = state.diaries.filter(d => d.is_public).slice(0, 4);
     
     return `
         <div class="relative py-12 artistic-view-container overflow-visible">
@@ -193,7 +191,7 @@ function homeView(state) {
                     ${t('home_title')}
                 </h1>
                 <p class="mx-auto max-w-3xl text-2xl leading-relaxed text-sub font-medium">
-                    ${t('home_desc')} 這裡不僅是文字的空間，更是您尋找內心平靜的數位避風港。
+                    ${t('home_desc')}
                 </p>
                 <div class="flex flex-wrap justify-center gap-6 pt-8">
                     <button type="button" class="btn-primary px-12 py-6 text-xl shadow-[0_20px_50px_rgba(180,83,9,0.3)]" data-open-auth="register">
@@ -216,7 +214,7 @@ function homeView(state) {
             <!-- How It Works: Step-by-Step -->
             <section class="mt-40 relative z-10 space-y-20">
                 <div class="text-center space-y-4">
-                    <h2 class="text-4xl font-black text-main">簡單三步，開啟您的內心探索</h2>
+                    <h2 class="text-4xl font-black text-main">${t('home_step_title')}</h2>
                     <div class="w-24 h-1.5 bg-accent mx-auto rounded-full"></div>
                 </div>
                 
@@ -224,20 +222,20 @@ function homeView(state) {
                     <div class="group card-base text-center space-y-6 hover:border-accent transition-all relative overflow-hidden">
                         <div class="absolute top-4 right-6 text-7xl font-black text-accent/10 pointer-events-none select-none">01</div>
                         <div class="relative z-10 w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center text-4xl mx-auto group-hover:scale-110 transition-transform">✍️</div>
-                        <h3 class="relative z-10 text-2xl font-black text-main">捕捉當下</h3>
-                        <p class="relative z-10 text-sub leading-relaxed">隨時隨地記錄您的想法與照片，捕捉那些稍縱即逝的情緒瞬間。</p>
+                        <h3 class="relative z-10 text-2xl font-black text-main">${t('home_step_1_title')}</h3>
+                        <p class="relative z-10 text-sub leading-relaxed">${t('home_step_1_desc')}</p>
                     </div>
                     <div class="group card-base text-center space-y-6 hover:border-accent transition-all relative overflow-hidden">
                         <div class="absolute top-4 right-6 text-7xl font-black text-accent/10 pointer-events-none select-none">02</div>
                         <div class="relative z-10 w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center text-4xl mx-auto group-hover:scale-110 transition-transform">📊</div>
-                        <h3 class="relative z-10 text-2xl font-black text-main">分析趨勢</h3>
-                        <p class="relative z-10 text-sub leading-relaxed">透過精美圖表，回顧一週、一月的情緒波動，發現更深層的自我。</p>
+                        <h3 class="relative z-10 text-2xl font-black text-main">${t('home_step_2_title')}</h3>
+                        <p class="relative z-10 text-sub leading-relaxed">${t('home_step_2_desc')}</p>
                     </div>
                     <div class="group card-base text-center space-y-6 hover:border-accent transition-all relative overflow-hidden">
                         <div class="absolute top-4 right-6 text-7xl font-black text-accent/10 pointer-events-none select-none">03</div>
                         <div class="relative z-10 w-20 h-20 bg-accent/10 rounded-3xl flex items-center justify-center text-4xl mx-auto group-hover:scale-110 transition-transform">🌱</div>
-                        <h3 class="relative z-10 text-2xl font-black text-main">持續成長</h3>
-                        <p class="relative z-10 text-sub leading-relaxed">在反思中獲得平靜，讓 Mood Diary 陪伴您走向更健康的心靈生活。</p>
+                        <h3 class="relative z-10 text-2xl font-black text-main">${t('home_step_3_title')}</h3>
+                        <p class="relative z-10 text-sub leading-relaxed">${t('home_step_3_desc')}</p>
                     </div>
                 </div>
             </section>
@@ -246,19 +244,19 @@ function homeView(state) {
             <section class="mt-60 space-y-32">
                 <div class="flex flex-col lg:flex-row items-center gap-20">
                     <div class="lg:w-1/2 space-y-8">
-                        <span class="text-xs font-black text-accent uppercase tracking-widest px-4 py-1 bg-accent/10 rounded-full">極致隱私</span>
-                        <h2 class="text-6xl font-black text-main leading-tight">您的祕密，<br>只有您知道。</h2>
-                        <p class="text-xl text-sub leading-relaxed">我們深知日記的私密性。這就是為什麼我們採用業界最嚴格的加密標準，您的所有數據在傳輸與存儲過程中都受到完整保護。</p>
+                        <span class="text-xs font-black text-accent uppercase tracking-widest px-4 py-1 bg-accent/10 rounded-full">${t('home_feature_1_tag')}</span>
+                        <h2 class="text-6xl font-black text-main leading-tight">${t('home_feature_1_title')}</h2>
+                        <p class="text-xl text-sub leading-relaxed">${t('home_feature_1_desc')}</p>
                         <div class="grid grid-cols-2 gap-6 pt-4">
                             <div class="space-y-2">
                                 <div class="text-accent text-2xl">🔒</div>
-                                <h4 class="font-black text-main">端對端傳輸</h4>
-                                <p class="text-sm text-muted">確保連線絕對安全。</p>
+                                <h4 class="font-black text-main">${t('home_feature_1_point_1_title')}</h4>
+                                <p class="text-sm text-muted">${t('home_feature_1_point_1_desc')}</p>
                             </div>
                             <div class="space-y-2">
                                 <div class="text-accent text-2xl">🛡️</div>
-                                <h4 class="font-black text-main">隱私優先</h4>
-                                <p class="text-sm text-muted">我們絕不讀取您的內容。</p>
+                                <h4 class="font-black text-main">${t('home_feature_1_point_2_title')}</h4>
+                                <p class="text-sm text-muted">${t('home_feature_1_point_2_desc')}</p>
                             </div>
                         </div>
                     </div>
@@ -275,15 +273,15 @@ function homeView(state) {
 
                 <div class="flex flex-col lg:flex-row-reverse items-center gap-20">
                     <div class="lg:w-1/2 space-y-8">
-                        <span class="text-xs font-black text-accent uppercase tracking-widest px-4 py-1 bg-accent/10 rounded-full">多媒體紀錄</span>
-                        <h2 class="text-6xl font-black text-main leading-tight">不只是文字，<br>還有回憶。</h2>
-                        <p class="text-xl text-sub leading-relaxed">有時候，一張照片勝過千言萬語。Mood Diary 支援圖片上傳，讓您能將當下的美景、食物或是笑容與文字一同封存。</p>
+                        <span class="text-xs font-black text-accent uppercase tracking-widest px-4 py-1 bg-accent/10 rounded-full">${t('home_feature_2_tag')}</span>
+                        <h2 class="text-6xl font-black text-main leading-tight">${t('home_feature_2_title')}</h2>
+                        <p class="text-xl text-sub leading-relaxed">${t('home_feature_2_desc')}</p>
                         <ul class="space-y-4 pt-4">
                             <li class="flex items-center gap-3 text-lg font-bold text-main">
-                                <span class="w-6 h-6 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs">✓</span> 無限制圖片上傳
+                                <span class="w-6 h-6 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs">✓</span> ${t('home_feature_2_point_1')}
                             </li>
                             <li class="flex items-center gap-3 text-lg font-bold text-main">
-                                <span class="w-6 h-6 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs">✓</span> 雲端即時同步
+                                <span class="w-6 h-6 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs">✓</span> ${t('home_feature_2_point_2')}
                             </li>
                         </ul>
                     </div>
@@ -298,27 +296,27 @@ function homeView(state) {
             <!-- Testimonials -->
             <section class="mt-60 space-y-16 py-20 bg-accent/5 rounded-[60px] border border-accent-soft px-12">
                 <div class="text-center space-y-4">
-                    <h2 class="text-4xl font-black text-main">聽聽使用者怎麼說</h2>
+                    <h2 class="text-4xl font-black text-main">${t('home_testimonial_title')}</h2>
                     <div class="flex justify-center gap-2 text-2xl">⭐⭐⭐⭐⭐</div>
                 </div>
                 <div class="grid gap-12 md:grid-cols-2">
                     <div class="space-y-6">
-                        <p class="text-2xl text-sub italic leading-relaxed font-medium">"這是我用過最純粹的日記 App。沒有社交干擾，只有我與自己的對話。介面真的美得讓人每天都想寫。"</p>
+                        <p class="text-2xl text-sub italic leading-relaxed font-medium">${t('home_testimonial_1_quote')}</p>
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 rounded-full bg-accent-soft"></div>
                             <div>
-                                <p class="font-black text-main text-lg">李小姐</p>
-                                <p class="text-sm text-muted font-bold">產品設計師</p>
+                                <p class="font-black text-main text-lg">${t('home_testimonial_1_name')}</p>
+                                <p class="text-sm text-muted font-bold">${t('home_testimonial_1_role')}</p>
                             </div>
                         </div>
                     </div>
                     <div class="space-y-6">
-                        <p class="text-2xl text-sub italic leading-relaxed font-medium">"原本以為自己沒辦法持續寫日記，但 Mood Diary 的操作非常簡單，視覺化圖表讓我很有成就感。"</p>
+                        <p class="text-2xl text-sub italic leading-relaxed font-medium">${t('home_testimonial_2_quote')}</p>
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 rounded-full bg-accent-soft"></div>
                             <div>
-                                <p class="font-black text-main text-lg">張先生</p>
-                                <p class="text-sm text-muted font-bold">大學教授</p>
+                                <p class="font-black text-main text-lg">${t('home_testimonial_2_name')}</p>
+                                <p class="text-sm text-muted font-bold">${t('home_testimonial_2_role')}</p>
                             </div>
                         </div>
                     </div>
@@ -345,8 +343,7 @@ function homeView(state) {
             <section class="mt-60 text-center space-y-12 py-32 relative">
                 <div class="absolute inset-0 bg-accent/5 rounded-[80px] -z-10 rotate-1"></div>
                 <h2 class="text-6xl font-black text-main leading-tight">
-                    每一種情緒都值得被記錄。<br>
-                    <span class="text-accent">現在就開始您的旅程吧。</span>
+                    ${t('home_cta_title')}
                 </h2>
                 <div class="flex flex-wrap justify-center gap-8 pt-8">
                     <button type="button" class="btn-primary px-16 py-8 text-2xl shadow-2xl" data-open-auth="register">
@@ -356,7 +353,7 @@ function homeView(state) {
                         ${t('continue_as_guest')}
                     </button>
                 </div>
-                <p class="text-muted font-bold mt-12">已有超過 10,000+ 位使用者加入我們</p>
+                <p class="text-muted font-bold mt-12">${t('home_cta_sub')}</p>
             </section>
         </div>
     `;
@@ -413,6 +410,9 @@ function authView(state) {
 
 function listView(state) {
     const isAuth = state.auth.isAuthenticated;
+    const role = state.auth.currentUser?.role || 'guest';
+    const isGuest = role === 'guest';
+
     return `
         <section class="space-y-12 py-12 fade-in artistic-view-container">
             <div class="view-blob view-blob-secondary"></div>
@@ -420,15 +420,15 @@ function listView(state) {
             <header class="flex flex-wrap items-end justify-between gap-6 border-b border-accent-soft pb-10 relative z-10">
                 <div>
                     <h2 class="text-5xl font-black tracking-tight text-main">${t('dashboard_title')}</h2>
-                    <p class="mt-4 text-xl text-sub font-medium">${isAuth ? t('dashboard_desc') : '正在以訪客模式體驗功能預覽'}</p>
+                    <p class="mt-4 text-xl text-sub font-medium">${isAuth && !isGuest ? t('dashboard_desc') : (isGuest ? t('guest_browsing_desc') : t('login_to_save_permanently'))}</p>
                 </div>
                 <div class="flex gap-4">
-                    ${isAuth ? `
+                    ${isAuth && !isGuest ? `
                         <button type="button" class="btn-primary text-base" data-nav="form">${t('new_diary')}</button>
                         <button type="button" class="btn-secondary !py-3 !px-6 text-base" data-refresh-api>${t('refresh_api')}</button>
                     ` : `
                         <div class="px-6 py-4 bg-accent/5 border border-accent-soft rounded-3xl flex items-center gap-4">
-                            <span class="text-sm font-bold text-accent">登入後即可開始紀錄您的生活</span>
+                            <span class="text-sm font-bold text-accent">${isGuest ? t('login_to_save_permanently') : t('login_to_save_permanently')}</span>
                             <button class="btn-primary !py-2 !px-6 text-xs" data-open-auth="login">${t('login_now')}</button>
                         </div>
                     `}
@@ -442,8 +442,9 @@ function listView(state) {
             ${state.diaries.length === 0 ? `
                 <div class="py-32 text-center space-y-6 card-base border-dashed relative z-10">
                     <div class="text-6xl">📝</div>
-                    <h3 class="text-2xl font-black text-main">還沒有日記紀錄</h3>
-                    <p class="text-sub">點擊右上方按鈕，開始紀錄您的第一篇心情日記吧！</p>
+                    <h3 class="text-2xl font-black text-main">${isGuest ? t('login_to_save_permanently') : t('no_history_yet')}</h3>
+                    <p class="text-sub">${isGuest ? t('auth_register_sub') : t('featured_default_desc')}</p>
+                    ${isGuest ? `<button class="btn-primary !py-3 !px-10 mt-4 mx-auto block" data-open-auth="register">${t('register_now')}</button>` : ''}
                 </div>
             ` : ''}
         </section>
@@ -538,15 +539,15 @@ function formView(state) {
                                 <input type="hidden" name="image_url" value="${diary?.image_url || ''}">
                             </div>
                             <div class="flex flex-col justify-center space-y-4">
-                                <p class="text-sm text-sub">點擊區域上傳照片或貼上圖片 URL，系統會自動儲存連結。</p>
-                                <input class="input-base text-sm" placeholder="輸入圖片 URL..." value="${diary?.image_url || ''}" data-photo-url-input>
+                                <p class="text-sm text-sub">${t('photo_upload_hint')}</p>
+                                <input class="input-base text-sm" placeholder="${t('image_url_placeholder')}" value="${escapeHtml(diary?.image_url || '')}" data-photo-url-input>
                             </div>
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-sm font-black uppercase tracking-widest text-muted">${t('content_label')}</label>
-                        <textarea name="content" rows="12" class="input-base text-lg font-medium leading-relaxed" placeholder="寫下此時此刻的想法..." required>${escapeHtml(diary?.content || '')}</textarea>
+                        <textarea name="content" rows="12" class="input-base text-lg font-medium leading-relaxed" placeholder="${t('content_placeholder')}" required>${escapeHtml(diary?.content || '')}</textarea>
                     </div>
 
                     <!-- Visibility Toggle -->
@@ -556,8 +557,8 @@ function formView(state) {
                                 <span id="visibility-icon" class="transition-transform group-hover:scale-110">${diary?.is_public ? '🌍' : '🔒'}</span>
                             </div>
                             <div>
-                                <h4 class="text-xl font-black text-main">公開設定</h4>
-                                <p class="text-sm text-muted">目前狀態：<span id="visibility-text" class="font-bold text-accent">${diary?.is_public ? '公開發佈' : '私人日記'}</span></p>
+                                <h4 class="text-xl font-black text-main">${t('visibility_settings')}</h4>
+                                <p class="text-sm text-muted">${t('current_status')} <span id="visibility-text" class="font-bold text-accent">${diary?.is_public ? t('status_public') : t('status_private')}</span></p>
                             </div>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
@@ -578,7 +579,7 @@ function formView(state) {
                         <div class="space-y-2">
                             <label class="text-sm font-black uppercase tracking-widest text-muted">${t('mood_label')}</label>
                             <select name="mood" class="input-base text-lg font-bold appearance-none cursor-pointer" required>
-                                <option value="">-- 選擇心情 --</option>
+                                <option value="">${t('select_mood')}</option>
                                 <option value="happy" ${diary?.mood === 'happy' ? 'selected' : ''}>${t('mood_happy')} 🙂</option>
                                 <option value="neutral" ${diary?.mood === 'neutral' ? 'selected' : ''}>${t('mood_neutral')} 😐</option>
                                 <option value="sad" ${diary?.mood === 'sad' ? 'selected' : ''}>${t('mood_sad')} 😢</option>
@@ -665,8 +666,8 @@ function adminView(state) {
                 <div class="card-base !p-8 flex items-center gap-6 group hover:border-emerald-500/30 transition-all">
                     <div class="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center text-3xl animate-pulse">🟢</div>
                     <div>
-                        <p class="text-xs font-black uppercase tracking-widest text-muted">系統健康度</p>
-                        <p class="text-xl font-black text-emerald-600 mt-1 uppercase">Operational</p>
+                        <p class="text-xs font-black uppercase tracking-widest text-muted">${t('system_health')}</p>
+                        <p class="text-xl font-black text-emerald-600 mt-1 uppercase">${t('operational')}</p>
                     </div>
                 </div>
             </div>
@@ -675,31 +676,32 @@ function adminView(state) {
                 ${renderMoodChart(moodSummary(state.diaries))}
                 <div class="card-base !p-8 flex flex-col justify-center text-center space-y-4">
                     <div class="text-5xl">💡</div>
-                    <h3 class="text-2xl font-black text-main">管理小撇步</h3>
-                    <p class="text-sub">定期查看情緒分佈，可以幫助您了解全站使用者的整體心理狀態，以便適時調整營運策略或推送溫馨內容。</p>
+                    <h3 class="text-2xl font-black text-main">${t('admin_tips')}</h3>
+                    <p class="text-sub">${t('admin_tips_desc')}</p>
                 </div>
             </div>
             
             <div class="space-y-12 relative z-10">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="h-1 w-12 bg-accent rounded-full"></div>
-                    <h4 class="text-sm font-black uppercase tracking-[0.4em] text-accent">資料管理中心</h4>
+                    <h4 class="text-sm font-black uppercase tracking-[0.4em] text-accent">${t('data_management_center')}</h4>
                 </div>
                 ${renderAdminUsersTable(state.users)}
-                ${renderAdminDiariesTable(state.diaries, 'all')}
+                ${renderAdminDiariesTable(state.diaries, state.adminMoodFilter)}
             </div>
         </section>
     `;
 }
 
 export function createDiaryApp(root) {
+    console.log('[App] Initializing createDiaryApp');
     const initialAuth = authStore.getState();
     const state = {
         view: initialAuth.isAuthenticated 
             ? (initialAuth.currentUser?.role === 'admin' ? 'admin' : 'list')
             : 'home',
         diaries: stateful([]),
-        users: stateful(mockUsers),
+        users: stateful([]),
         selectedDiaryId: null,
         editingDiaryId: null,
         authMode: 'login',
@@ -707,19 +709,23 @@ export function createDiaryApp(root) {
         settings: settingsStore.getState(),
         loading: false,
         error: '',
+        adminMoodFilter: 'all',
         modal: null, // { title, message, actionText, onAction, icon }
     };
 
     function setState(patch) {
+        console.log('[App] setState patch:', patch);
         Object.assign(state, patch);
         render();
     }
 
     function showModal(title, message, actionText, onAction, icon = '🔒') {
+        console.log('[App] showModal:', { title, message });
         setState({ modal: { title, message, actionText, onAction, icon } });
     }
 
     settingsStore.subscribe((s) => {
+        console.log('[Settings] Store update:', s);
         document.documentElement.classList.toggle('dark', s.theme === 'dark');
         setState({ settings: s });
     });
@@ -750,22 +756,22 @@ export function createDiaryApp(root) {
     }
 
     function render() {
-        console.log('Rendering App, current state:', state);
+        console.log('[App] Rendering. View:', state.view, 'State:', state);
         const isDark = state.settings.theme === 'dark';
         const isAuth = state.auth.isAuthenticated;
         const role = state.auth.currentUser?.role || 'guest';
         const isGuest = role === 'guest';
         const isAdmin = role === 'admin';
 
-        console.log('Auth Status:', { isAuth, role, isGuest, isAdmin, currentView: state.view });
+        console.log('[App] Auth Context:', { isAuth, role, isGuest, isAdmin });
 
         let content = '';
         if (state.loading) {
+            console.log('[App] Rendering Loading State');
             if (state.view === 'admin') content = skeletonAdminView();
             else if (state.view === 'detail') content = skeletonDetailView();
             else content = skeletonListView();
         } else if (state.view === 'auth' && !isAuth) {
-            console.log('Rendering Auth View');
             content = authView(state);
         } else if (state.view === 'form' && isAuth && !isGuest) content = formView(state);
         else if (state.view === 'detail') content = detailView(state, !isAuth || isGuest);
@@ -854,34 +860,42 @@ export function createDiaryApp(root) {
     }
 
     async function fetchDiaries() {
-        console.log('Fetching Diaries... Authenticated:', state.auth.isAuthenticated);
+        console.log('[API] Fetching Diaries. Auth:', state.auth.isAuthenticated);
         setState({ loading: true });
         try {
             const list = await diaryApi.list();
-            console.log('Fetched Diaries Success:', list.length, 'items');
-            
-            // Merge mockDiaries (Admin posts) with real API results to ensure persistence
-            const combined = [...mockDiaries];
-            list.forEach(diary => {
-                if (!combined.some(m => String(m.id) === String(diary.id))) {
-                    combined.push(diary);
-                }
-            });
-            
+            console.log('[API] Fetched Success:', list.length, 'items');
+            const combined = list.length > 0 ? list : [...mockDiaries];
             setState({ diaries: stateful(combined), loading: false });
         } catch (err) {
-            console.error('Fetch Diaries Failed:', err);
-            // Even if API fails, ensure mock data is available
+            console.error('[API] Fetch Failed:', err);
             setState({ diaries: stateful(mockDiaries), loading: false });
-            if (state.auth.isAuthenticated) {
-                console.warn('Failed to fetch diaries from API', err);
-            }
+        }
+    }
+
+    async function fetchUsers() {
+        if (state.auth.currentUser?.role !== 'admin') return;
+        console.log('[API] Fetching Users for Admin');
+        try {
+            const list = await authApi.listUsers();
+            console.log('[API] Fetched Users raw:', list);
+            const userArray = Array.isArray(list) ? list : (list?.data ? list.data : []);
+            console.log('[API] Extracted Users array length:', userArray.length);
+            
+            // Explicitly set through setState to ensure reactivity across all flows
+            setState({ users: stateful(userArray) });
+        } catch (err) {
+            console.error('[API] Fetch Users Failed:', err);
         }
     }
 
     function wireEvents() {
+        console.log('[Events] Wiring events for current view:', state.view);
+
         root.querySelectorAll('[data-nav]').forEach(b => b.addEventListener('click', async () => {
-            if (b.dataset.nav === 'form' && !state.auth.isAuthenticated) {
+            const target = b.dataset.nav;
+            console.log('[Nav] Clicked:', target);
+            if (target === 'form' && !state.auth.isAuthenticated) {
                 showModal(t('authentication'), t('login_required_to_create'), t('login_now'), () => {
                     setState({ view: 'auth', authMode: 'login', modal: null });
                 });
@@ -889,88 +903,107 @@ export function createDiaryApp(root) {
             }
             // clear any existing form/auth error when navigating
             state.error = '';
-            const targetView = b.dataset.nav === 'home' ? (state.auth.isAuthenticated ? 'list' : 'home') : b.dataset.nav;
+            const targetView = target === 'home' ? (state.auth.isAuthenticated ? 'list' : 'home') : target;
             
             if (targetView === 'list' || targetView === 'admin' || targetView === 'history') {
                 setState({ view: targetView, loading: true });
-                await fetchDiaries();
+                if (targetView === 'admin') {
+                    await Promise.all([fetchDiaries(), fetchUsers()]);
+                } else {
+                    await fetchDiaries();
+                }
             } else {
-                setState({ view: targetView, editingDiaryId: null });
+                setState({ view: targetView, editingDiaryId: null, loading: false });
             }
         }));
 
         root.querySelector('[data-modal-action]')?.addEventListener('click', () => {
+            console.log('[Modal] Action clicked');
             state.modal?.onAction?.();
         });
 
         root.querySelector('[data-modal-close]')?.addEventListener('click', () => {
+            console.log('[Modal] Close clicked');
             setState({ modal: null });
         });
+
         root.querySelectorAll('[data-open-auth]').forEach(b => {
             b.addEventListener('click', () => {
-                state.view = 'auth';
-                state.authMode = b.dataset.openAuth;
-                render();
+                console.log('[Auth] Open auth mode:', b.dataset.openAuth);
+                setState({ view: 'auth', authMode: b.dataset.openAuth, error: '' });
             });
         });
+
         root.querySelectorAll('[data-toggle-auth-mode]').forEach(b => b.addEventListener('click', () => {
-            state.authMode = state.authMode === 'login' ? 'register' : 'login';
-            render();
+            const nextMode = state.authMode === 'login' ? 'register' : 'login';
+            console.log('[Auth] Toggle mode to:', nextMode);
+            setState({ authMode: nextMode, error: '' });
         }));
+
         root.querySelectorAll('[data-logout]').forEach(b => b.addEventListener('click', () => {
+            console.log('[Auth] Logout clicked');
             authStore.clearSession();
-            state.view = 'home';
-            render();
+            setState({ view: 'home' });
         }));
-        root.querySelectorAll('[data-theme-toggle]').forEach(b => b.addEventListener('click', () => settingsStore.toggleTheme()));
-        root.querySelector('[data-lang-select]')?.addEventListener('change', e => settingsStore.setLang(e.target.value));
+
+        root.querySelectorAll('[data-theme-toggle]').forEach(b => b.addEventListener('click', () => {
+            console.log('[Settings] Theme toggle');
+            settingsStore.toggleTheme();
+        }));
+
+        root.querySelector('[data-lang-select]')?.addEventListener('change', e => {
+            console.log('[Settings] Lang change:', e.target.value);
+            settingsStore.setLang(e.target.value);
+        });
+
         root.querySelectorAll('[data-back-list]').forEach(b => b.addEventListener('click', () => {
-            state.view = 'list';
-            render();
+            console.log('[Nav] Back to list');
+            setState({ view: 'list', error: '' });
         }));
+
         root.querySelectorAll('[data-open-diary]').forEach(b => {
             b.addEventListener('click', () => {
-                state.selectedDiaryId = b.dataset.openDiary;
-                state.view = 'detail';
-                render();
+                console.log('[Nav] Open diary ID:', b.dataset.openDiary);
+                setState({ selectedDiaryId: b.dataset.openDiary, view: 'detail' });
             });
         });
+
         root.querySelectorAll('[data-refresh-api]').forEach(b => b.addEventListener('click', async () => {
-            await fetchDiaries();
-            state.editingDiaryId = null;
-            render();
+            console.log('[API] Manual refresh requested');
+            if (state.view === 'admin' || state.auth.currentUser?.role === 'admin') {
+                await Promise.all([fetchDiaries(), fetchUsers()]);
+            } else {
+                await fetchDiaries();
+            }
+            setState({ editingDiaryId: null });
         }));
+
         root.querySelectorAll('[data-edit-diary]').forEach(b => {
             b.addEventListener('click', () => {
-                state.error = '';
-                state.editingDiaryId = b.dataset.editDiary;
-                state.view = 'form';
-                render();
+                console.log('[Nav] Edit diary ID:', b.dataset.editDiary);
+                setState({ error: '', editingDiaryId: b.dataset.editDiary, view: 'form' });
             });
         });
 
         async function performDelete(id, targetRow = null) {
-            showModal(t('delete_confirm'), '確定要永久刪除這篇日記嗎？此動作無法復原。', t('delete'), async () => {
-                if (targetRow) {
-                    targetRow.classList.add('row-fade-out');
-                }
-                
-                // Close modal immediately to show the fade-out effect
+            console.log('[Diary] Attempt delete ID:', id);
+            showModal(t('delete_confirm'), t('delete_confirm_msg'), t('delete'), async () => {
+                if (targetRow) targetRow.classList.add('row-fade-out');
                 setState({ modal: null });
                 
                 setTimeout(async () => {
                     try {
                         await diaryApi.remove(id);
+                        console.log('[Diary] Delete success ID:', id);
                         state.diaries = state.diaries.filter(d => String(d.id) !== String(id));
-                        // If we were viewing the detail of the deleted diary, go back to list
                         if (state.view === 'detail' && String(state.selectedDiaryId) === String(id)) {
                             state.view = 'list';
                         }
                         render();
                     } catch (err) {
+                        console.error('[Diary] Delete failed:', err);
                         if (targetRow) targetRow.classList.remove('row-fade-out');
-                        state.error = err?.formattedError?.message || '刪除失敗';
-                        render();
+                        setState({ error: err?.formattedError?.message || t('delete_failed') });
                     }
                 }, targetRow ? 500 : 0);
             }, '🗑️');
@@ -978,13 +1011,23 @@ export function createDiaryApp(root) {
 
         if (state.view === 'admin') {
             bindAdminUsersTable(root, (id) => {
+                console.log('[Admin] Suspend user ID:', id);
                 const row = root.querySelector(`[data-suspend-user="${id}"]`)?.closest('tr');
                 if (row) {
-                    showModal('停用確認', `確定要停用使用者 #${id} 嗎？`, '停用', () => {
+                    showModal(t('suspend_confirm_title'), t('suspend_confirm_msg').replace('{id}', id), t('ok'), () => {
                         row.classList.add('row-fade-out');
-                        setTimeout(() => {
-                             alert(`Suspend user ${id} (Mock)`);
-                             setState({ modal: null });
+                        setState({ modal: null });
+                        setTimeout(async () => {
+                            try {
+                                await authApi.deleteUser(id);
+                                console.log('[Admin] User deleted ID:', id);
+                                state.users = state.users.filter(u => String(u.id) !== String(id));
+                                render();
+                            } catch (err) {
+                                console.error('[Admin] Delete user failed:', err);
+                                row.classList.remove('row-fade-out');
+                                setState({ error: err?.formattedError?.message || '刪除使用者失敗' });
+                            }
                         }, 500);
                     }, '🚫');
                 }
@@ -992,13 +1035,18 @@ export function createDiaryApp(root) {
             bindAdminDiariesTable(root, async (id) => {
                 const row = root.querySelector(`[data-delete-diary="${id}"]`)?.closest('tr');
                 performDelete(id, row);
+            }, (id) => {
+                console.log('[Admin] Edit diary ID:', id);
+                setState({ error: '', editingDiaryId: id, view: 'form' });
+            });
+
+            root.querySelector('[data-mood-filter]')?.addEventListener('change', (e) => {
+                console.log('[Admin] Mood filter changed to:', e.target.value);
+                setState({ adminMoodFilter: e.target.value });
             });
         } else {
-            // Non-admin view (Detail view) delete binding
             root.querySelectorAll('[data-delete-diary]').forEach(b => {
-                b.addEventListener('click', async () => {
-                    performDelete(b.dataset.deleteDiary);
-                });
+                b.addEventListener('click', () => performDelete(b.dataset.deleteDiary));
             });
         }
         
@@ -1010,9 +1058,17 @@ export function createDiaryApp(root) {
 
         root.querySelectorAll('[data-guest-login]').forEach(b => {
             b.addEventListener('click', async () => {
-                state.view = 'list';
-                state.error = '';
-                render();
+                console.log('[Auth] Guest login requested');
+                setState({ loading: true, error: '' });
+                try {
+                    const res = await authApi.guestLogin();
+                    console.log('[Auth] Guest Login Success:', res);
+                    authStore.setSession({ token: res.access_token, currentUser: res.user });
+                    setState({ view: 'list', loading: false });
+                } catch (err) {
+                    console.error('[Auth] Guest Login Error:', err);
+                    setState({ error: '訪客登入失敗，請稍後再試。', loading: false });
+                }
             });
         });
 
@@ -1022,19 +1078,22 @@ export function createDiaryApp(root) {
         const photoUrlHidden = root.querySelector('input[name="image_url"]');
 
         if (photoPlaceholder && photoFileInput) {
-            photoPlaceholder.addEventListener('click', () => photoFileInput.click());
+            photoPlaceholder.addEventListener('click', () => {
+                console.log('[Form] Photo placeholder clicked');
+                photoFileInput.click();
+            });
         }
 
         if (photoFileInput) {
             photoFileInput.addEventListener('change', async (event) => {
                 const file = event.target.files?.[0];
-                if (!file) {
-                    return;
-                }
+                if (!file) return;
+                console.log('[Form] Photo selected:', file.name);
 
                 try {
                     const { url } = await photoApi.uploadPhoto(file);
-                    // Normalize returned URL: if it's relative, resolve against current origin; if hostname is localhost and missing port, attach current port
+                    console.log('[Form] Photo uploaded:', url);
+                    
                     let normalizedUrl = url || '';
                     try {
                         const resolved = new URL(normalizedUrl, window.location.origin);
@@ -1042,24 +1101,24 @@ export function createDiaryApp(root) {
                             resolved.port = window.location.port;
                         }
                         normalizedUrl = resolved.toString();
-                    } catch (e) {
-                        // fallback: leave as-is
-                    }
+                    } catch (e) {}
 
-                    if (photoUrlHidden) {
-                        photoUrlHidden.value = normalizedUrl;
-                    }
-                    if (photoUrlInput) {
-                        photoUrlInput.value = normalizedUrl;
-                    }
+                    if (photoUrlHidden) photoUrlHidden.value = normalizedUrl;
+                    if (photoUrlInput) photoUrlInput.value = normalizedUrl;
                     const preview = photoPlaceholder?.querySelector('.photo-preview');
                     if (preview) {
                         preview.innerHTML = `<img src="${normalizedUrl}" class="w-full h-full object-cover">`;
                     }
                     event.target.value = '';
                 } catch (uploadError) {
-                    state.error = '圖片上傳失敗，請使用 jpg、png、gif 或 webp 格式，且大小不超過 2MB。';
-                    render();
+                    console.error('[Form] Photo upload error:', uploadError);
+                    if (uploadError.response) {
+                        console.log('[Form] Photo upload response data:', JSON.stringify(uploadError.response.data, null, 2));
+                        const details = uploadError.response.data.errors ? Object.values(uploadError.response.data.errors).flat().join(' ') : uploadError.response.data.message;
+                        setState({ error: `圖片上傳失敗：${details}` });
+                    } else {
+                        setState({ error: '圖片上傳失敗，請檢查網路連線或檔案格式。' });
+                    }
                 }
             });
         }
@@ -1067,6 +1126,7 @@ export function createDiaryApp(root) {
         if (photoUrlInput && photoUrlHidden) {
             photoUrlInput.addEventListener('input', () => {
                 const value = photoUrlInput.value.trim();
+                console.log('[Form] Photo URL manual input:', value);
                 photoUrlHidden.value = value;
                 const preview = photoPlaceholder?.querySelector('.photo-preview');
                 if (preview) {
@@ -1084,8 +1144,8 @@ export function createDiaryApp(root) {
         const profileForm = root.querySelector('[data-profile-form]');
         if (profileForm) profileForm.addEventListener('submit', handleProfileSubmit);
 
-        // Visibility toggle icon update
         root.querySelector('input[name="is_public"]')?.addEventListener('change', (e) => {
+            console.log('[Form] Visibility toggle:', e.target.checked);
             const icon = root.querySelector('#visibility-icon');
             const text = root.querySelector('#visibility-text');
             if (icon) icon.textContent = e.target.checked ? '🌍' : '🔒';
@@ -1097,63 +1157,89 @@ export function createDiaryApp(root) {
         e.preventDefault();
         const fd = new FormData(e.target);
         const data = Object.fromEntries(fd);
-        console.log('Attempting Auth:', { mode: state.authMode, data }); // Debug
+        console.log('[Form] Auth submit. Mode:', state.authMode, 'Data:', { ...data, password: '***' });
         try {
-            const res = state.authMode === 'register' ? await authApi.register(data) : await authApi.login(data);
-            console.log('Auth Success:', res);
-            authStore.setSession({ token: res.access_token, currentUser: res.user });
-            state.view = res.user.role === 'admin' ? 'admin' : 'list';
-            render();
+            if (state.authMode === 'register') {
+                await authApi.register(data);
+                console.log('[Auth] Register Success');
+                showModal(t('success'), '帳號已成功建立，請重新登入以開始使用。', t('login_now'), () => {
+                    setState({ authMode: 'login', error: '', modal: null });
+                }, '🎉');
+            } else {
+                const res = await authApi.login(data);
+                console.log('[Auth] Login Success:', res);
+                authStore.setSession({ token: res.access_token, currentUser: res.user });
+                setState({ view: res.user.role === 'admin' ? 'admin' : 'list' });
+            }
         } catch (err) {
-            console.error('Auth Error Details:', err.response?.data);
+            console.error('[Auth] Error:', err.response?.data);
             const errors = err.response?.data?.errors;
             const detailMsg = errors ? Object.values(errors).flat().join(' ') : '';
-            state.error = detailMsg || err?.formattedError?.message || '認證失敗。';
-            render();
+            setState({ error: detailMsg || err?.formattedError?.message || '認證失敗。' });
         }
     }
 
     async function handleDiarySubmit(e) {
         e.preventDefault();
-        const fd = new FormData(e.target);
-        const isPublic = fd.get('is_public') === '1';
+        console.log('[Form] handleDiarySubmit started');
+        try {
+            const fd = new FormData(e.target);
+            const isPublic = fd.get('is_public') === '1';
+            console.log('[Form] Diary submit. isPublic:', isPublic, 'Data preview:', Object.fromEntries(fd));
 
-        const submitAction = async () => {
-            const data = fd; // pass FormData directly to API
-            try {
-                if (state.editingDiaryId) {
-                    const res = await diaryApi.update(state.editingDiaryId, data);
-                    // update local state using returned diary object
-                    state.diaries = state.diaries.map(d => String(d.id) === String(state.editingDiaryId) ? res : d);
-                } else {
-                    const res = await diaryApi.create(data);
-                    state.diaries.unshift(res);
+            const submitAction = async () => {
+                console.log('[Form] Executing diary submission action');
+                try {
+                    let res;
+                    if (state.editingDiaryId) {
+                        console.log('[API] Updating diary ID:', state.editingDiaryId);
+                        res = await diaryApi.update(state.editingDiaryId, fd);
+                        state.diaries = state.diaries.map(d => String(d.id) === String(state.editingDiaryId) ? res : d);
+                    } else {
+                        console.log('[API] Creating new diary');
+                        res = await diaryApi.create(fd);
+                        state.diaries.unshift(res);
+                    }
+                    console.log('[Diary] Success. Result:', res);
+                    setState({ view: 'list', error: '', editingDiaryId: null });
+                } catch (err) {
+                    console.error('[Diary] Submission error (Full):', err);
+                    const responseData = err.response?.data;
+                    console.log('[Diary] Response data (Stringified):', JSON.stringify(responseData, null, 2));
+                    
+                    const msg = responseData?.message || err?.formattedError?.message || '儲存失敗。';
+                    const errors = responseData?.errors;
+                    let detailMsg = '';
+                    
+                    if (errors) {
+                        detailMsg = Object.entries(errors)
+                            .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+                            .join(' | ');
+                    }
+                    
+                    const finalMsg = detailMsg ? `${msg} (${detailMsg})` : msg;
+                    console.error('[Diary] Final error message:', finalMsg);
+                    setState({ error: finalMsg });
                 }
-                state.view = 'list';
-                render();
-            } catch (err) {
-                // Prefer formatted backend message (validation errors etc.)
-                const msg = err?.formattedError?.message || err?.response?.data?.message || '儲存失敗。';
-                // If there are validation details, include them
-                const details = err?.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null;
-                state.error = details ? `${msg} ${details}` : msg;
-                render();
-            }
-        };
+            };
 
-        if (isPublic) {
-            showModal(
-                '公開發佈聲明',
-                '在公開此日記前，請確認：<br>1. 內容符合網路通訊規定與法律。<br>2. 避免包含侮辱、歧視或仇恨性言論。<br>3. 您同意將此內容展示給大眾。<br><br>點擊「確認發佈」即代表您同意上述聲明。',
-                '確認發佈',
-                () => {
-                    setState({ modal: null });
-                    submitAction();
-                },
-                '🌍'
-            );
-        } else {
-            submitAction();
+            if (isPublic) {
+                showModal(
+                    t('public_disclaimer_title'),
+                    t('public_disclaimer_msg'),
+                    t('confirm_publish'),
+                    () => {
+                        setState({ modal: null });
+                        submitAction();
+                    },
+                    '🌍'
+                );
+            } else {
+                submitAction();
+            }
+        } catch (fatalError) {
+            console.error('[Form] Fatal error in handleDiarySubmit:', fatalError);
+            setState({ error: '系統發生錯誤，請查看控制台日誌。' });
         }
     }
 
@@ -1161,33 +1247,44 @@ export function createDiaryApp(root) {
         e.preventDefault();
         const fd = new FormData(e.target);
         const data = Object.fromEntries(fd);
+        console.log('[Form] Profile update submit:', data);
         try {
-            // Mock API call for profile update
-            console.log('Update profile', data);
             const updatedUser = { ...state.auth.currentUser, ...data };
             authStore.setSession({ token: state.auth.token, currentUser: updatedUser });
             showModal(t('success'), t('profile_updated'), t('ok'), () => {
                 setState({ view: 'list', modal: null });
             }, '✨');
         } catch (err) {
-            state.error = '個人資料更新失敗';
-            render();
+            console.error('[Profile] Update error:', err);
+            setState({ error: '個人資料更新失敗' });
         }
     }
 
     authStore.subscribe(async (a) => {
+        console.log('[Auth] Store updated. IsAuthenticated:', a.isAuthenticated);
         const prevAuth = state.auth?.isAuthenticated;
         state.auth = a;
-        // If user just became authenticated, fetch diaries from API
         if (!prevAuth && state.auth.isAuthenticated) {
+            console.log('[Auth] User just logged in, fetching diaries');
             await fetchDiaries();
         }
         render();
     });
 
     render();
-    // If already authenticated on load, fetch server diaries
+    console.log('[App] Initial data fetch');
+    fetchDiaries();
+    
     if (state.auth.isAuthenticated) {
-        fetchDiaries();
+        if (state.auth.currentUser?.role === 'admin') {
+            fetchUsers();
+        }
+        authApi.getUser().then(user => {
+            console.log('[Auth] Profile refresh success:', user.email);
+            authStore.setSession({ token: state.auth.token, currentUser: user });
+        }).catch(err => {
+            console.error('[Auth] Profile refresh failed, clearing session:', err);
+            authStore.clearSession();
+        });
     }
 }

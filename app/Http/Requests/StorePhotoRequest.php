@@ -22,7 +22,7 @@ class StorePhotoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'photo' => 'required|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'photo' => 'required',
         ];
     }
 
@@ -37,21 +37,5 @@ class StorePhotoRequest extends FormRequest
             'photo.mimes' => '照片格式必須為：jpg、jpeg、png、gif 或 webp',
             'photo.max' => '照片大小不能超過 2MB',
         ];
-    }
-
-    /**
-     * Handle a failed validation attempt.
-     */
-    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
-    {
-        $response = response()->json([
-            'success' => false,
-            'status' => 'validation_error',
-            'message' => '驗證失敗',
-            'errors' => $validator->errors(),
-            'data' => null,
-        ], 422);
-
-        throw new \Illuminate\Validation\ValidationException($validator, $response);
     }
 }

@@ -49,8 +49,8 @@ export function renderAdminDiariesTable(diaries, moodFilter) {
                                     </td>
                                     <td class="px-8 py-6">
                                         <div class="flex flex-col">
-                                            <span class="font-bold text-main">${escapeHtml(diary.user ?? t('demo_user'))}</span>
-                                            <span class="text-[10px] text-muted uppercase tracking-wider">${diary.user_email ?? 'user@example.com'}</span>
+                                            <span class="font-bold text-main">${escapeHtml(diary.user?.name ?? t('demo_user'))}</span>
+                                            <span class="text-[10px] text-muted uppercase tracking-wider">${escapeHtml(diary.user?.email ?? 'user@example.com')}</span>
                                         </div>
                                     </td>
                                     <td class="px-8 py-6 text-sub font-medium truncate max-w-[200px]">${escapeHtml(diary.title)}</td>
@@ -65,13 +65,22 @@ export function renderAdminDiariesTable(diaries, moodFilter) {
                                     </td>
                                     <td class="px-8 py-6 text-muted text-sm">${formatDiaryDate(diary.date)}</td>
                                     <td class="px-8 py-6 text-right">
-                                        <button
-                                            type="button"
-                                            class="btn-secondary !py-2 !px-4 text-xs !border-rose-200 !text-rose-600 hover:!bg-rose-600 hover:!text-white active:scale-95 transition-all"
-                                            data-delete-diary="${escapeHtml(diary.id)}"
-                                        >
-                                            ${t('delete')}
-                                        </button>
+                                        <div class="flex justify-end gap-2">
+                                            <button
+                                                type="button"
+                                                class="btn-secondary !py-2 !px-4 text-xs hover:!bg-accent hover:!text-white active:scale-95 transition-all"
+                                                data-edit-diary="${escapeHtml(diary.id)}"
+                                            >
+                                                ${t('edit')}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn-secondary !py-2 !px-4 text-xs !border-rose-200 !text-rose-600 hover:!bg-rose-600 hover:!text-white active:scale-95 transition-all"
+                                                data-delete-diary="${escapeHtml(diary.id)}"
+                                            >
+                                                ${t('delete')}
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             `;
@@ -88,10 +97,15 @@ export function renderAdminDiariesTable(diaries, moodFilter) {
     `;
 }
 
-export function bindAdminDiariesTable(root, onDelete) {
+export function bindAdminDiariesTable(root, onDelete, onEdit) {
     root.querySelectorAll('[data-delete-diary]').forEach((button) => {
         button.addEventListener('click', () => {
             onDelete?.(button.dataset.deleteDiary);
+        });
+    });
+    root.querySelectorAll('[data-edit-diary]').forEach((button) => {
+        button.addEventListener('click', () => {
+            onEdit?.(button.dataset.editDiary);
         });
     });
 }

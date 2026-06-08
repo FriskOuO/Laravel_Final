@@ -12,6 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->append(\App\Http\Middleware\LogRequest::class);
         $middleware->alias([
             'ensuretoken' => \App\Http\Middleware\EnsureTokenIsValid::class,
             'role' => \App\Http\Middleware\CheckRole::class,

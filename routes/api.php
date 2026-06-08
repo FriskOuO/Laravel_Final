@@ -23,6 +23,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Photo upload (for authenticated users)
     Route::post('/photos', [PhotoController::class, 'store']);
 
+    // Admin only routes
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/users', [AuthController::class, 'index']);
+        Route::delete('/users/{id}', [AuthController::class, 'destroy']);
+    });
+
     // Diary management (requires specific roles)
     Route::middleware('role:user,admin')->group(function () {
         Route::post('/diaries', [PostApiController::class, 'store']);

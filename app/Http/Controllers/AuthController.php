@@ -22,15 +22,12 @@ class AuthController extends Controller
             'name' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'user', // Explicitly set role
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return $this->createdResponse([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
             'user' => $user,
-        ], '帳號已成功建立');
+        ], '帳號已成功建立，請重新登入');
     }
 
     public function login(Request $request)
@@ -81,5 +78,23 @@ class AuthController extends Controller
         $request->user()->tokens()->delete();
 
         return $this->successResponse(null, '已登出');
+    }
+
+    public function index()
+    {
+        $users = User::all();
+        return $this->successResponse($users);
+    }
+
+    public function destroy(Request $request, string $id)
+    {
+        if ($request->user()->id == $id) {
+            return $this->errorResponse('無法刪除您自己的管理員帳號。', null, 400);
+        }
+
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return $this->successResponse(null, '使用者已成功刪除');
     }
 }

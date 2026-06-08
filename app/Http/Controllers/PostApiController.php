@@ -14,7 +14,7 @@ class PostApiController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
+        $user = request()->user('sanctum');
 
         if ($user && $user->role === 'admin') {
             // Admin sees everything
@@ -64,6 +64,8 @@ class PostApiController extends Controller
      */
     public function store(StorePostRequest $request)
     {
+        \Illuminate\Support\Facades\Log::info('Store Diary Request:', $request->all());
+        \Illuminate\Support\Facades\Log::info('Current User ID: ' . Auth::id());
         $data = $request->validated();
         // Handle checkbox: if missing, it means it's private (false)
         $data['is_public'] = $request->boolean('is_public', false);
@@ -78,7 +80,7 @@ class PostApiController extends Controller
      */
     public function show(string $id)
     {
-        $user = Auth::user();
+        $user = request()->user('sanctum');
 
         if ($user && $user->role === 'admin') {
             $diary = Post::with('user')->find($id);
@@ -102,6 +104,7 @@ class PostApiController extends Controller
      */
     public function update(UpdatePostRequest $request, string $id)
     {
+        \Illuminate\Support\Facades\Log::info('Update Diary Request ID ' . $id . ':', $request->all());
         if (Auth::user()->role === 'admin') {
             $diary = Post::find($id);
         } else {

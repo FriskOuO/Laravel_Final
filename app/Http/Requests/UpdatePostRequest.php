@@ -27,7 +27,7 @@ class UpdatePostRequest extends FormRequest
             'mood' => 'sometimes|required|string|in:happy,neutral,sad',
             'date' => 'sometimes|required|date',
             'image_url' => 'nullable|string|max:2048',
-            'is_public' => 'sometimes|boolean',
+            'is_public' => 'sometimes',
         ];
     }
 
@@ -48,21 +48,5 @@ class UpdatePostRequest extends FormRequest
             'date.date' => '日期格式錯誤',
             'image_url.url' => '圖片 URL 格式錯誤',
         ];
-    }
-
-    /**
-     * Handle a failed validation attempt.
-     */
-    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
-    {
-        $response = response()->json([
-            'success' => false,
-            'status' => 'validation_error',
-            'message' => '驗證失敗',
-            'errors' => $validator->errors(),
-            'data' => null,
-        ], 422);
-
-        throw new \Illuminate\Validation\ValidationException($validator, $response);
     }
 }

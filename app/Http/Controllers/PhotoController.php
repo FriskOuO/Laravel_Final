@@ -7,18 +7,26 @@ use Illuminate\Support\Facades\Storage;
 
 class PhotoController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:sanctum');
-    }
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(StorePhotoRequest $request)
     {
+        \Illuminate\Support\Facades\Log::info('Photo upload request received');
         try {
-            $path = $request->file('photo')->store('diaries', 'public');
+            if (!$request->hasFile('photo')) {
+                \Illuminate\Support\Facades\Log::warning('No photo file in request');
+                return $this->errorResponse('未收到照片檔案', null, 422);
+            }
+            
+            $file = $request->file('photo');
+            \Illuminate\Support\Facades\Log::info('File info:', [
+                'name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime' => $file->getMimeType()
+            ]);
+
+            $path = $file->store('diaries', 'public');
             $url = Storage::disk('public')->url($path);
 
             return $this->createdResponse([
